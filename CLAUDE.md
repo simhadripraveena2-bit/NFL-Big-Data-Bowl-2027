@@ -63,8 +63,16 @@ Every proposed direction, experiment and final result is judged against all thre
   - `research_notes/research_proposals.md` (3 candidate proposals);
   - `research_notes/methodology_comparison.md` (method fit + ranked comparison matrix).
   - Current ranking, for discussion only: B (exposure-aware A–S frontier, 29/35) > C (capacity-constrained minimum-time COD, 28/35) > A′ (re-scoped consistency, 20/35) > A as specified (14/35, not identifiable from combine data).
+- Phase 1.6 (feasibility simulations for the approved B + C programme, "Athletic Capacity and Movement Efficiency"): complete. See:
+  - `research_notes/candidate_b_feasibility.md` (Experiment 1);
+  - `research_notes/candidate_c_feasibility.md` (Experiment 2);
+  - `research_notes/feasibility_comparison.md` (comparison + recommendation);
+  - notebooks 02/03; `scripts/run_capacity_simulation.py`, `scripts/run_cod_simulation.py`; figures `reports/figures/sim_*.png`.
+  - Headline (simulation only):
+    - B: measurement and preprocessing dominate. SIMEX halves the S0 bias, but A0 is best from plain binning, and pooling hurts calibration.
+    - C: the CCMT execution cost beats the COD deficit only with precise athlete limits (≤ 5% A0/S0, ≤ 10% D/C).
 - **Research hypothesis: NOT finalised — awaiting approval.**
-- Phase 2: **not started — awaiting approval.** No preprocessing, no feature engineering, no models trained.
+- Phase 2 (real-data feasibility / features / models): **not started — awaiting approval.** No NFL outcome data used so far.
 
 ## Data facts that must not be forgotten (verified in Phases 1–1.5)
 
@@ -77,6 +85,14 @@ Every proposed direction, experiment and final result is judged against all thre
 - Harmonise drill-name synonyms across years before pooling.
 - Same-drill repetitions are scarce: 75% of (player, drill) pairs have one attempt; only the 40 has two attempts for most players (90%).
 - Unit of inference is the **player** (n ≈ 500; 63–77 per position with ≥100 REG plays). Split by player, never by frame or play.
+
+## Simulation rules (Phase 1.6)
+
+- Development seeds (101–103) are for design only. Evaluation uses disjoint seeds. Never tune on evaluation output.
+- Every estimator in a comparison uses identical preprocessing. Smoothing window, sampling rate and noise are sensitivity factors.
+- Simulated improvements are never reported as real-world validity.
+- Base tracking noise is 0.01 yd: it matches real game Δ²x and Δ²s statistics.
+- When building polars frames from lists of dicts, pass `infer_schema_length=None`. Columns missing from early rows are silently dropped otherwise (this bug cost one rerun).
 
 ## Literature rules (Phase 1.5)
 

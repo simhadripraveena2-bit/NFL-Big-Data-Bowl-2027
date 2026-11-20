@@ -74,7 +74,9 @@ pip install -r requirements.txt
 |---|---|
 | 0. Setup, data access, download | ✅ Done |
 | 1. Exploratory data analysis | ✅ Done — `notebooks/01_dataset_exploration.ipynb`, `research_notes/` |
-| 2. Feature engineering | ⏸ Awaiting approval |
+| 1.5 Literature review & research gaps | ✅ Done — `research_notes/` |
+| 1.6 Feasibility simulations (B + C) | ✅ Done — notebooks 02–03, `research_notes/*feasibility*.md` |
+| 2. Real-data feasibility / feature engineering | ⏸ Awaiting approval |
 | 3. Modelling & novel algorithm | — |
 | 4. Write-up & submission | — |
 
