@@ -57,9 +57,16 @@ Every proposed direction, experiment and final result is judged against all thre
 
 - Phase 0 (setup): complete.
 - Phase 1 (dataset exploration): complete. See `notebooks/01_dataset_exploration.ipynb` and `research_notes/`.
-- Phase 2: **not started — awaiting approval.** No hypothesis selected, no models trained.
+- Phase 1.5 (literature review and research-gap identification): complete. See:
+  - `research_notes/literature_review.md` (123 verified papers: 106 abstracts read, 2 summary-only, 15 metadata-only; no full texts);
+  - `research_notes/research_gap_analysis.md`;
+  - `research_notes/research_proposals.md` (3 candidate proposals);
+  - `research_notes/methodology_comparison.md` (method fit + ranked comparison matrix).
+  - Current ranking, for discussion only: B (exposure-aware A–S frontier, 29/35) > C (capacity-constrained minimum-time COD, 28/35) > A′ (re-scoped consistency, 20/35) > A as specified (14/35, not identifiable from combine data).
+- **Research hypothesis: NOT finalised — awaiting approval.**
+- Phase 2: **not started — awaiting approval.** No preprocessing, no feature engineering, no models trained.
 
-## Data facts that must not be forgotten (verified in Phase 1)
+## Data facts that must not be forgotten (verified in Phases 1–1.5)
 
 - `a` is an **unsigned** acceleration magnitude (combine and game). Derive signed / braking acceleration from `s`.
 - Combine `dis` is **not** per-frame displacement (≈0.46×). Derive distance from `x, y`. Game `dis` is fine.
@@ -68,4 +75,10 @@ Every proposed direction, experiment and final result is judged against all thre
 - WR/TE game rows contain **only route-running dropbacks**. OL/DL/DB rows include run plays.
 - Exclude faulty game 2025101205 (plays 1289, 1314) and spikes with `s` > 12.5 yd/s.
 - Harmonise drill-name synonyms across years before pooling.
+- Same-drill repetitions are scarce: 75% of (player, drill) pairs have one attempt; only the 40 has two attempts for most players (90%).
 - Unit of inference is the **player** (n ≈ 500; 63–77 per position with ≥100 REG plays). Split by player, never by frame or play.
+
+## Literature rules (Phase 1.5)
+
+- Cite only papers whose DOI has been verified. State whether the abstract or full text was read. Never attribute findings to metadata-only references.
+- Before any novelty claim, read the full texts of the closest prior work: Morin 2021, Miguens 2024, Clark 2019, Silva 2026, Nimphius 2016, Chu 2020, Hedeker 2008.

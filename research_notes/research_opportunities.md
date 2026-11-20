@@ -24,7 +24,7 @@ Facts from Phase 1 that shape every direction:
 | `dir` uses the NGS convention in both sources; `o` exists only in games | body-vs-travel direction (e.g. backpedal) is game-only |
 | Game tracking holds only cohort players and no ball | no opponent-relative geometry from tracking; `player_play` supplies separation, cushion, pressure and get-off |
 | 40-yard recordings end ≈0.5 s after peak speed | sprint braking is not observable in the 40; braking lives in the agility and skill drills |
-| Skill drills are standardised paths repeated 6–18 times per player | within-player reliability and movement consistency are measurable |
+| Skill drills: 6–18 attempts per player *across different drills* in a family. **Correction (Phase 1.5): the same drill is repeated only once by 75% of (player, drill) pairs; only the 40 has two attempts for most players (90%)** | per-athlete movement consistency is **not** identifiable from the combine; population-level reliability is, mainly for the 40 |
 | Game sequences include ≈1 s before the snap | stance and get-off are observable in games |
 | WR/TE game data covers only route-running dropbacks (no run or blocking snaps); OL/DL/DB include run plays | WR/TE in-game envelopes describe route running only; cross-position comparisons are not like-for-like |
 
@@ -59,7 +59,7 @@ risks. They are ordered by how strongly the current data supports them.
 - **Question:** beyond scalar times, does the *shape* of a player's path and speed profile in a fixed drill encode transferable skill (e.g. route-break sharpness, pass-pro mirroring, DB transition)? Does the *consistency* across repeated attempts matter?
 - **Data support:**
   - 56 drill names with fixed choreography (fig04).
-  - Median attempts per player: WR 14, TE 11, DB 10, DL 8, OL 8. This enables within-player reliability (ICC) and variability estimates, which a single stopwatch time cannot give.
+  - Median attempts per player: WR 14, TE 11, DB 10, DL 8, OL 8. **Correction (Phase 1.5):** these attempts are spread across many *different* drills. 75% of (player, drill) pairs have a single attempt, so within-player reliability is estimable mainly for the 40-yd dash (two attempts for 90% of players). See `research_gap_analysis.md` §0.
   - Ball tracks for 551 WR/TE catching attempts allow player–ball timing.
 - **Prior work to check:** functional data analysis and trajectory-embedding work in sports. Recent tracking-transformer work in prior Big Data Bowls ([SumerSports BDB 2026](https://sumersports.com/the-zone/sumersports-big-data-bowl-2026); "step-and-turn" generative movement model, [arXiv 2603.17866](https://arxiv.org/pdf/2603.17866)). Applying any of this to combine drills needs a dedicated literature search.
 - **Risks:**
