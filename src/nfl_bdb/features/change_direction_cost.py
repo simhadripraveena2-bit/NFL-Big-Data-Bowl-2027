@@ -381,3 +381,58 @@ def cone_turn_path(radius, turn_deg=90.0, approach=10.0, exit_len=10.0, ds=0.02)
     P = np.array(pts)
     s = np.r_[0, np.cumsum(np.linalg.norm(np.diff(P, axis=0), axis=1))]
     return Path(s=s, x=P[:, 0], y=P[:, 1], kappa=np.array(kap), stop=np.zeros(len(s), bool))
+
+
+# ----------------------------------------------------------------------------- real combine drills (Phase 2)
+def real_drill_segment(x, y, s, fs=10.0, window=7, poly=2, onset="raw", stop_speed=1.0, edge_yd=1.0, ds=0.02,
+                       stops=True):
+    """Gate and path for a real combine agility attempt (3-cone or short shuttle), both of which
+    finish by crossing back over the start line.
+
+    onset: "raw"  = last frame with provided speed <= 0.3 yd/s before speed first exceeds 1.0 yd/s
+                     (frame 0 if the recording already starts in motion);
+           "extrapolated" = linear back-extrapolation of the first 5 frames of the speed rise to s = 0.
+    finish: last crossing of the line through the start point perpendicular to the final heading.
+    Returns dict(path, T_obs, L, n_stops, ok, reason)."""
+    s = np.asarray(s, float); x = np.asarray(x, float); y = np.asarray(y, float)
+    k = np.flatnonzero(s > 1.0)
+    if len(k) == 0 or len(s) < window + 5:
+        return dict(ok=False, reason="no movement")
+    i0 = int(k[0])
+    while i0 > 0 and s[i0] > 0.3:
+        i0 -= 1
+    t0 = float(i0)
+    if onset == "extrapolated":
+        tt = np.arange(i0, min(i0 + 5, len(s))); sl, ic = np.polyfit(tt, s[tt], 1)
+        if sl > 0:
+            t0 = min(-ic / sl, float(i0))
+    p0 = np.array([x[i0], y[i0]])
+    d = np.array([x[-1] - x[-4], y[-1] - y[-4]]); nd = np.linalg.norm(d)
+    if nd < 1e-6:
+        return dict(ok=False, reason="no final heading")
+    d /= nd
+    proj = (x - p0[0]) * d[0] + (y - p0[1]) * d[1]
+    c = np.flatnonzero((proj[:-1] < 0) & (proj[1:] >= 0)); c = c[c > i0 + 10]
+    if len(c) == 0:
+        return dict(ok=False, reason="no finish crossing")
+    j = int(c[-1]); tf = j + (-proj[j]) / (proj[j + 1] - proj[j])
+    dt = 1.0 / fs
+    xs = savgol_filter(x, window, poly); ys = savgol_filter(y, window, poly)
+    vx = savgol_filter(x, window, poly, deriv=1, delta=dt); vy = savgol_filter(y, window, poly, deriv=1, delta=dt)
+    ax = savgol_filter(x, window, poly, deriv=2, delta=dt); ay = savgol_filter(y, window, poly, deriv=2, delta=dt)
+    sp = np.hypot(vx, vy)
+    seg = slice(i0, j + 2)
+    X, Y = xs[seg], ys[seg]
+    sarc = np.r_[0, np.cumsum(np.hypot(np.diff(X), np.diff(Y)))]
+    s_fin = float(np.interp(tf, np.arange(i0, j + 2), sarc))
+    kap = np.abs(vx * ay - vy * ax)[seg] / np.maximum(sp[seg], 0.3) ** 3
+    sps = sp[seg]
+    stop_idx = [i for i in range(1, len(sps) - 1) if stops and sps[i] < stop_speed and sps[i] <= sps[i - 1]
+                and sps[i] <= sps[i + 1] and edge_yd < sarc[i] < s_fin - edge_yd]
+    keep = np.r_[True, np.diff(sarc) > 1e-6]
+    idx = np.flatnonzero(keep)
+    P = Path(s=sarc[keep], x=X[keep], y=Y[keep], kappa=kap[keep], stop=np.isin(idx, stop_idx))
+    P = resample_path(P, ds)
+    m = P.s <= s_fin + 1e-9
+    P = Path(s=P.s[m], x=P.x[m], y=P.y[m], kappa=np.where(P.stop[m], 0.0, P.kappa[m]), stop=P.stop[m])
+    return dict(ok=True, reason="", path=P, T_obs=float((tf - t0) * dt), L=float(P.length), n_stops=int(P.stop.sum()))

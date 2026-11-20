@@ -76,7 +76,8 @@ pip install -r requirements.txt
 | 1. Exploratory data analysis | ✅ Done — `notebooks/01_dataset_exploration.ipynb`, `research_notes/` |
 | 1.5 Literature review & research gaps | ✅ Done — `research_notes/` |
 | 1.6 Feasibility simulations (B + C) | ✅ Done — notebooks 02–03, `research_notes/*feasibility*.md` |
-| 2. Real-data feasibility / feature engineering | ⏸ Awaiting approval |
+| 2. Real-data feasibility validation | ✅ Done — notebooks 04–05, `research_notes/` |
+| 3. Next phase (TBD) | ⏸ Awaiting approval |
 | 3. Modelling & novel algorithm | — |
 | 4. Write-up & submission | — |
 

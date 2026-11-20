@@ -71,8 +71,19 @@ Every proposed direction, experiment and final result is judged against all thre
   - Headline (simulation only):
     - B: measurement and preprocessing dominate. SIMEX halves the S0 bias, but A0 is best from plain binning, and pooling hurts calibration.
     - C: the CCMT execution cost beats the COD deficit only with precise athlete limits (≤ 5% A0/S0, ≤ 10% D/C).
+- Phase 2 (real-data feasibility validation): complete. See:
+  - `research_notes/real_data_capacity_transfer.md`;
+  - `research_notes/braking_estimation_validation.md`;
+  - `research_notes/lateral_constraint_validation.md`;
+  - `research_notes/combine_execution_cost.md`;
+  - notebooks 04/05; scripts `run_real_capacity.py`, `run_real_movement.py`, `run_real_combine_execution.py`.
+  - Headline:
+    - Speed capacity: rankings transfer partially within position (peak ↔ game max ρ 0.13 DB to 0.73 DL); game levels are far lower than combine levels.
+    - Game A0: not measurable (implausible values grow with exposure).
+    - D99 braking and C99 lateral envelopes: robust, but they are demonstrated, context-dependent envelopes, not capacities.
+    - CCMT execution cost: not yet valid on real combine data (timing validity, non-identifiable limits, weak reliability; shuttle unusable).
 - **Research hypothesis: NOT finalised — awaiting approval.**
-- Phase 2 (real-data feasibility / features / models): **not started — awaiting approval.** No NFL outcome data used so far.
+- Next phase: **not started — awaiting approval.** No NFL performance outcomes used so far.
 
 ## Data facts that must not be forgotten (verified in Phases 1–1.5)
 
@@ -84,6 +95,11 @@ Every proposed direction, experiment and final result is judged against all thre
 - Exclude faulty game 2025101205 (plays 1289, 1314) and spikes with `s` > 12.5 yd/s.
 - Harmonise drill-name synonyms across years before pooling.
 - Same-drill repetitions are scarce: 75% of (player, drill) pairs have one attempt; only the 40 has two attempts for most players (90%).
+- Game-derived braking (D99) and lateral (C99) values are *demonstrated envelopes*. Never use them as capacity limits: they make combine drills "impossible" (negative execution cost).
+- Use a_t (from positions or speed) for braking, never the provided `a`. In sharp turns, 22–33% of |a|² is turning.
+- Game A0 by binning is implausible (> 15 yd/s²) for 22% of high-exposure players. Use robust peak-speed measures for game speed capacity.
+- Real combine drill timing from tracking: 3-cone r = 0.65 with official time; shuttle r = 0.40 and not repeatable.
+- Within-position reliability must be reported; pooled reliabilities are inflated by position differences.
 - Unit of inference is the **player** (n ≈ 500; 63–77 per position with ≥100 REG plays). Split by player, never by frame or play.
 
 ## Simulation rules (Phase 1.6)
@@ -93,6 +109,10 @@ Every proposed direction, experiment and final result is judged against all thre
 - Simulated improvements are never reported as real-world validity.
 - Base tracking noise is 0.01 yd: it matches real game Δ²x and Δ²s statistics.
 - When building polars frames from lists of dicts, pass `infer_schema_length=None`. Columns missing from early rows are silently dropped otherwise (this bug cost one rerun).
+
+## Memory rule (Phase 2)
+
+- Loading all game seasons with many derived columns exceeds 15 GB. Process per season, write float32 frame tables to `data/interim/`, aggregate lazily, and run heavy pipelines one at a time.
 
 ## Literature rules (Phase 1.5)
 
