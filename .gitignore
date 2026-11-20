@@ -1,0 +1,72 @@
+# ===== Competition data: NEVER commit (Kaggle rules) =====
+data/raw/*
+data/interim/*
+data/processed/*
+data/external/*
+!data/*/.gitkeep
+*.csv
+*.parquet
+*.feather
+*.zip
+*.gz
+*.7z
+*.tar
+*.h5
+*.hdf5
+*.pkl
+*.pickle
+*.npy
+*.npz
+
+# ===== Credentials: NEVER commit =====
+.kaggle/
+kaggle.json
+access_token
+.env
+.env.*
+*.pem
+*.key
+secrets/
+credentials*
+
+# ===== Model artifacts / experiment outputs =====
+experiments/*
+!experiments/.gitkeep
+/models/
+/checkpoints/
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.joblib
+mlruns/
+wandb/
+lightning_logs/
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# ===== Notebooks =====
+.ipynb_checkpoints/
+
+# ===== Large figures / editor / OS =====
+reports/figures/*
+!reports/figures/.gitkeep
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+.claude/settings.local.json
