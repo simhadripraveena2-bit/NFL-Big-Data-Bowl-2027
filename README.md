@@ -36,6 +36,8 @@ This downloads and extracts into `data/raw/nfl-big-data-bowl-2027/`:
 
 Total ≈ 2.3 GB extracted (489 MB zipped).
 
+The first notebook run caches the CSVs as Parquet in `data/interim/` (≈0.46 GB, git-ignored) via `nfl_bdb.data.io.build_parquet_cache()`.
+
 ## Repository layout
 
 ```
@@ -49,6 +51,7 @@ docs/               research notes, literature review
 experiments/        experiment logs and outputs (git-ignored)
 notebooks/          exploratory and narrative notebooks
 paper/              write-up / submission drafts
+research_notes/     written findings (dataset inventory, player matching, research opportunities)
 reports/figures/    generated figures (git-ignored)
 scripts/            CLI entry points (e.g. download_data.sh)
 src/nfl_bdb/        package: data, features, models, evaluation, visualization
@@ -70,8 +73,8 @@ pip install -r requirements.txt
 | Phase | Status |
 |---|---|
 | 0. Setup, data access, download | ✅ Done |
-| 1. Exploratory data analysis | ⏸ Awaiting approval |
-| 2. Feature engineering | — |
+| 1. Exploratory data analysis | ✅ Done — `notebooks/01_dataset_exploration.ipynb`, `research_notes/` |
+| 2. Feature engineering | ⏸ Awaiting approval |
 | 3. Modelling & novel algorithm | — |
 | 4. Write-up & submission | — |
 

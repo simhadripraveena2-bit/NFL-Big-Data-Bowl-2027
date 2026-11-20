@@ -55,6 +55,17 @@ Every proposed direction, experiment and final result is judged against all thre
 
 ## Current status
 
-- Phase 0 (setup): complete — Kaggle access verified, data downloaded to
-  `data/raw/nfl-big-data-bowl-2027/` and size-verified.
-- Phase 1 (EDA): **not started — awaiting approval.**
+- Phase 0 (setup): complete.
+- Phase 1 (dataset exploration): complete. See `notebooks/01_dataset_exploration.ipynb` and `research_notes/`.
+- Phase 2: **not started — awaiting approval.** No hypothesis selected, no models trained.
+
+## Data facts that must not be forgotten (verified in Phase 1)
+
+- `a` is an **unsigned** acceleration magnitude (combine and game). Derive signed / braking acceleration from `s`.
+- Combine `dis` is **not** per-frame displacement (≈0.46×). Derive distance from `x, y`. Game `dis` is fine.
+- `dir` follows NGS: 0° = +y, clockwise. `o` exists only in game data.
+- Game tracking contains **only the 510 cohort players**: no ball, no other players.
+- WR/TE game rows contain **only route-running dropbacks**. OL/DL/DB rows include run plays.
+- Exclude faulty game 2025101205 (plays 1289, 1314) and spikes with `s` > 12.5 yd/s.
+- Harmonise drill-name synonyms across years before pooling.
+- Unit of inference is the **player** (n ≈ 500; 63–77 per position with ≥100 REG plays). Split by player, never by frame or play.
