@@ -183,6 +183,26 @@ def h1_procedure(player, ctx, team, y, Xw, Wres, x_player, B, rng, alpha=0.05, d
                 disagree=bool(abs(reml.delta - mb["delta_m"]) > 0.5 * mb["se"]))
 
 
+H1_B_REGISTERED = 2000   # protocol §10 / spec §1.3
+
+
+def h1_registered_test(player, ctx, team, y, Xw, x_player, seed, B=H1_B_REGISTERED, alpha=0.05, d=2):
+    """Confirmatory H1 test after approved deviation D1 (preregistration §15): the registered PRIMARY inference,
+    i.e. REML point estimate + player-cluster percentile bootstrap that refits the full REML model in every
+    resample (team-season columns shared, as registered; D2 rejected). The moment-bootstrap fallback
+    (`h1_procedure`) is retired for decisions and kept only for reproducing the Phase 4 simulations.
+    Decision: supported iff Delta_hat > 0 and the two-sided (1 - alpha) percentile CI excludes 0."""
+    if B < H1_B_REGISTERED:
+        raise ValueError(f"confirmatory H1 requires B >= {H1_B_REGISTERED} (got {B})")
+    reml = h1_reml(player, ctx, team, y, Xw, x_player, d)
+    bt = h1_reml_bootstrap(player, ctx, team, y, Xw, x_player, B, np.random.default_rng(seed), alpha=alpha, d=d,
+                           start=reml.extra["theta"])
+    lo, hi = bt["ci"]
+    return dict(delta=reml.delta, rho=reml.rho, beta=reml.beta, sigma_b=reml.sigma_b, s2_team=reml.s2_team,
+                converged=reml.converged, ci_lo=lo, ci_hi=hi, p=bt["p"], se_boot=bt["se"], B=B, n_ok=bt["n_ok"],
+                alpha=alpha, seed=seed, supported=bool(reml.delta > 0 and lo > 0), boot=bt["boot"])
+
+
 # ------------------------------------------------------------------------------------------------
 # H2
 # ------------------------------------------------------------------------------------------------

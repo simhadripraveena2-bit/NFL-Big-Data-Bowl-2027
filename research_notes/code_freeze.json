@@ -1,0 +1,18 @@
+{
+ "description": "Pre-join code freeze (approved D1/D3). Any change to these files after the join must be logged in preregistration.md \u00a715.",
+ "validated_phase4_commit": "a690b9a1b59c72fca98aa20dada8be3948aac226",
+ "files": {
+  "src/nfl_bdb/models/confirmatory.py": "2b7d06cdaaaecbe557068e9aa0109fbdb03b10db49e3d9eb3cac6150f310b08d",
+  "src/nfl_bdb/models/reml.py": "7decc6d0d81dce96f2e2992a57c1fa7453746e18baf7f2a8059b86c97a399c55",
+  "src/nfl_bdb/data/play_table.py": "9755b6b48b2464a454a974e54cc4e2ff1299973741b4bfe451978051f9f0cc0d",
+  "src/nfl_bdb/data/confirmatory_data.py": "cbc77a7fc42272f1885d70ad8d77a1038f24a5b86c9b713721d2ccd74609f2d6",
+  "src/nfl_bdb/data/io.py": "11b4c60a4fc24175f108ab084f8bd7843c0b620f8f0473f68bd794b9d05e59a6",
+  "src/nfl_bdb/data/game_kinematics.py": "2b7a4a3b3f9331f51d469541e41ee053b18ffa88b3a2a64a84083982db4b8f4c",
+  "src/nfl_bdb/features/demand.py": "f10e70c0a1a07c282dd6ff6199ef734f315a871aae0040e45745f278fdf9e41b",
+  "src/nfl_bdb/features/forty_reliability.py": "cdeee09243a861bfe96fda051787d1b2456fe91091e6854f0555b327af99db8c",
+  "scripts/run_confirmatory_join.py": "acc7581bf6d529984334342e1fae3c9b6a89b76830f26130e68bdd733d8913d7",
+  "scripts/run_real_capacity.py": "810c6d238002eebe2e8afaadf559bce3d50f9f75005ad880b9a1018cecd80b0b",
+  "scripts/run_phase3_screening.py": "525ab946332cf2c528c0be6cd51367a27ec67749d013a6f7c36158a7d3a3ef18",
+  "scripts/run_forty_reliability.py": "49cf4ca619b3be7858054a77ca42f82eb96906c90527b444fdec883e73b1711f"
+ }
+}

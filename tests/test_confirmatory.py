@@ -141,3 +141,17 @@ def test_meta_regression_recovers_slope():
     rho = 0.2 + 2.0 * D
     lam, se, om = dm.meta_regression_reml(rho, np.full(11, 0.01), D, pos)
     assert abs(lam - 2.0) < 1e-3
+
+
+def test_h1_registered_test_uses_full_reml_bootstrap():
+    import pytest
+    player, ctx, team, y, Xw, z, rng = _toy_h1(30, 0.7, 0.1, P=60)
+    with pytest.raises(ValueError):
+        cf.h1_registered_test(player, ctx, team, y, Xw, z, seed=1, B=100)   # below the registered B
+    # same engine as the registered bootstrap: identical draws for the same seed
+    cf_b = cf.H1_B_REGISTERED
+    assert cf_b == 2000
+    reml = cf.h1_reml(player, ctx, team, y, Xw, z)
+    bt = cf.h1_reml_bootstrap(player, ctx, team, y, Xw, z, 5, np.random.default_rng(7), start=reml.extra["theta"])
+    bt2 = cf.h1_reml_bootstrap(player, ctx, team, y, Xw, z, 5, np.random.default_rng(7), start=reml.extra["theta"])
+    assert np.allclose(bt["boot"], bt2["boot"])
