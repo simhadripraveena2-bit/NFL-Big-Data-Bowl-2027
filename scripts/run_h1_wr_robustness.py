@@ -27,6 +27,7 @@ Seeds are declared in SEEDS below before any run.
 from __future__ import annotations
 
 import json
+import multiprocessing as mp
 import os
 import subprocess
 import sys
@@ -171,7 +172,8 @@ def main():
         jobs.append((f"R12_class_{cls}", base.filter(pl.col("draft_year") == cls), COVS, "x_peak", SEEDS[f"R12_{cls}"], None))
     perm_seeds = [SEEDS["N1"] + i for i in range(N_PERM)]
     res = {}
-    with ProcessPoolExecutor(4) as ex:
+    # spawn (not fork): forking after polars' thread pool has started deadlocks (first attempt hung at 0 % CPU)
+    with ProcessPoolExecutor(4, mp_context=mp.get_context("spawn")) as ex:
         fut_sp = ex.submit(run_spline, (base, knots, SEEDS["R7"]))
         fut_cv = ex.submit(run_spline_cv, (base, knots, SEEDS["R7_cv"]))
         futs = {j[0]: ex.submit(run_test, j) for j in jobs}
