@@ -99,7 +99,10 @@ Every proposed direction, experiment and final result is judged against all thre
   - `scripts/run_synthetic_validation.py` + `scripts/phase4_stages.py` (run id 20261121T023847Z), `scripts/build_notebook_07.py`.
   - Headline: the registered full REML bootstrap is valid but conservative for H1-WR (null size <= 0.0125; power 0.45 at delta 0.2, 0.94 at 0.35). The registered fallback (moment bootstrap) is liberal for WR (0.045) and invalid for DB (0.225). H2 is estimation-only (full support <= 0.035). Fixed-sequence FWER <= 0.02.
   - Proposed deviations awaiting approval (NOT implemented): D1 retire the fallback; D2 (optional) fix the crossed-design bootstrap; D3 combine-only 40 test-retest + EIV tipping point.
-- Next phase (confirmatory analysis): **not started — awaiting approval.** No combine x game-performance association has been computed.
+- Pre-join (approved): D1 retire fallback (approved), D2 (rejected), D3 40 test-retest (done: `forty_test_retest.md`; within-WR R_x 0.94, not 0.987) logged in preregistration §15. Code frozen at `955d94d` (`research_notes/code_freeze.json` + `tests/test_code_freeze.py`).
+- **The single combine x outcome join has been performed** (run 20261121T135032Z, `scripts/run_confirmatory_join.py`, outputs in `data/interim/confirmatory_join/`). See `research_notes/join_validation_report.md`: all registered sample sizes reproduced, 0 duplicates, raw unchanged.
+- Confirmatory models: **not fitted — awaiting review of the join-validation report and a decision on D4 (H2 primary vs secondary).** No combine x outcome association has been computed or inspected.
+- Confirmatory H1 must use `confirmatory.h1_registered_test` (full REML bootstrap, B = 2000). Never `h1_procedure`.
 
 ## Data facts that must not be forgotten (verified in Phases 1–1.5)
 
