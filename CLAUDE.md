@@ -101,7 +101,9 @@ Every proposed direction, experiment and final result is judged against all thre
   - Proposed deviations awaiting approval (NOT implemented): D1 retire the fallback; D2 (optional) fix the crossed-design bootstrap; D3 combine-only 40 test-retest + EIV tipping point.
 - Pre-join (approved): D1 retire fallback (approved), D2 (rejected), D3 40 test-retest (done: `forty_test_retest.md`; within-WR R_x 0.94, not 0.987) logged in preregistration §15. Code frozen at `955d94d` (`research_notes/code_freeze.json` + `tests/test_code_freeze.py`).
 - **The single combine x outcome join has been performed** (run 20261121T135032Z, `scripts/run_confirmatory_join.py`, outputs in `data/interim/confirmatory_join/`). See `research_notes/join_validation_report.md`: all registered sample sizes reproduced, 0 duplicates, raw unchanged.
-- Confirmatory models: **not fitted — awaiting review of the join-validation report and a decision on D4 (H2 primary vs secondary).** No combine x outcome association has been computed or inspected.
+- D4 approved (Option A): H2 demoted to secondary, estimation-focused (logged in §15). Hierarchy: H1-WR sole primary; H2 secondary estimation; Holm secondary family {H1-DB, H1-DL(a), H1-DL(b), H5(b)} unchanged; H5(a)/(c), H1-global estimation; TE descriptive.
+- Pre-model audit passed (`research_notes/pre_model_audit.md`, `scripts/run_pre_model_audit.py`): frozen code unchanged, single join unchanged, rules re-verified, sample sizes = registered.
+- Confirmatory models: **not fitted — awaiting approval.** No combine x outcome association has been computed or inspected.
 - Confirmatory H1 must use `confirmatory.h1_registered_test` (full REML bootstrap, B = 2000). Never `h1_procedure`.
 
 ## Data facts that must not be forgotten (verified in Phases 1–1.5)

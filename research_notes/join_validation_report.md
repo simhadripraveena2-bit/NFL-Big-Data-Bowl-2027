@@ -18,12 +18,12 @@
 | 2 | Validated code frozen; exact commit recorded | ✅ Phase 4 validated code: `a690b9a`. **Pre-join freeze, which is also the commit that ran the join: `955d94d4486175223d045af6a883e09ac519432d`.** `research_notes/code_freeze.json` holds sha256 hashes of 12 pipeline files, and `tests/test_code_freeze.py` fails if any changes. |
 | 3 | Combine-only 40 test–retest (D3) | ✅ `forty_test_retest.md`. No game table read. Results logged under D3 (within-position R_x: WR 0.94 best-of-2; R_F not identifiable, WR R_F ≥ 0.70). |
 | 4 | H1-WR primary test = full REML bootstrap, B = 2,000 | ✅ `confirmatory.h1_registered_test`: REML refit in every resample, shared team-season columns (D2 rejected), and it raises an error if B < 2,000. A smoke test at B = 2,000 on synthetic data completed (2,000/2,000 refits converged, 268 s). The fallback `h1_procedure` remains only for reproducing Phase 4. |
-| 5 | H2 secondary and estimation-focused | ⚠️ **Discrepancy: decision needed (proposed D4, below).** The frozen protocol registers H2 as **primary confirmatory, test 2 of the fixed sequence** (§2, §9), not secondary. Phase 4 showed its interpretation can only be estimation-focused (full support ≤ 0.035). I have **not** changed its status. |
+| 5 | H2 secondary and estimation-focused | ✅ **Resolved by D4 (approved, Option A, logged in §15 before any association).** H2 was registered as the second primary test; it is now secondary and estimation-focused. The original text below is kept as the record. |
 | 6 | DB secondary, TE descriptive | ✅ As registered: H1-DB is in the secondary Holm family (§9), and H1-TE is "descriptive only" (§2). |
 | 7 | Registered matching rules, seasons, eligibility, missing-data rules | ✅ Implemented in `src/nfl_bdb/data/confirmatory_data.py`. **All registered sample sizes are reproduced exactly** (§5 below). |
-| 8 | Raw data not modified or overwritten | ✅ sha256 of every file under `data/raw/` (10 files, 2.7 GB) is identical before and after. The interim inputs are also unchanged. Outputs went only to new directories. |
+| 8 | Raw data not modified or overwritten | ✅ sha256 of every file under `data/raw/` (11 files: 9 CSVs, the downloaded zip and `.gitkeep`; 2.7 GB) is identical before and after. The interim inputs are also unchanged. Outputs went only to new directories. |
 
-### Proposed D4 (needs your decision before any model is fitted)
+### Proposed D4 (decided 2026-11-21: Option A approved; see preregistration §15)
 
 **Option A: demote H2 to secondary/estimation.**
 - The primary family becomes {H1-WR} alone, at α = 0.05.
@@ -64,10 +64,46 @@
 | OL | 121 | 95 | 95 | 120 | 91 | **73** | 30 | 18 |
 | **all** | **510** | **418** | 424 | 497 | 401 | **332** | **109** | 69 |
 
-**Unmatched combine players:**
-- **109** combine participants have no REG game rows. Of these, 13 have no game rows of any kind (Phase 1: zero snaps, consistent).
-- A further 69 have REG rows but no valid tracked 40, so they are excluded by §5 (the predictor is the object of study).
-- 510 − 418 = **92 players without a valid tracked 40**, exactly as registered in §5.
+**Reconciliation of the player counts** (corrected 2026-11-21; the join itself is unchanged).
+
+The first version listed 109, 69 and 92 without stating that these sets overlap. Here are the definitions and the full partition.
+
+- **Denominator:** U = the 510 combine participants. Every one of them has a predictor row: 510 rows, 510 unique nfl_id.
+- **R** = participants with ≥ 1 REG-season `player_play` row: |R| = 401.
+- **G** = participants with any `player_play` row (PRE, REG or POST): |G| = 497, and R ⊂ G.
+- **V** = participants with a valid tracked 40 (≥ 1 attempt with R² > 0.95 and peak ≤ 12.5 yd/s): |V| = 418.
+
+**Mutually exclusive categories** (they sum to 510):
+
+| category | definition | WR | TE | DB | DL | OL | **all** |
+|---|---|---|---|---|---|---|---|
+| A. matched | R ∩ V | 73 | 28 | 81 | 77 | 73 | **332** |
+| B. REG rows, no valid 40 | R ∩ ¬V | 10 | 5 | 15 | 21 | 18 | **69** |
+| C. PRE/POST rows only, valid 40 | (G \ R) ∩ V | 20 | 3 | 18 | 13 | 21 | **75** |
+| D. no game rows, valid 40 | ¬G ∩ V | 1 | 3 | 3 | 3 | 1 | **11** |
+| E. PRE/POST rows only, no valid 40 | (G \ R) ∩ ¬V | 3 | 2 | 4 | 4 | 8 | **21** |
+| F. no game rows, no valid 40 | ¬G ∩ ¬V | 0 | 1 | 1 | 0 | 0 | **2** |
+| **total** | U | 107 | 42 | 122 | 118 | 121 | **510** |
+
+**How the earlier figures decompose:**
+- "**109** have no REG rows" = ¬R = C + D + E + F = 75 + 11 + 21 + 2. Of these, **13** (D + F) have no game rows of any kind; the other 96 appear only in PRE/POST games.
+- "**69** have REG rows but no valid tracked 40" = B. B is disjoint from the 109.
+- "**92** have no valid tracked 40" = ¬V = B + E + F = 69 + 21 + 2. It overlaps the 109 in **23** players (E + F).
+- Check: 332 + 69 + 109 = 510, and 418 + 92 = 510.
+
+**Only category A (332 players) can enter any analysis.** The eligibility rules reduce A to the registered samples:
+
+| | A (matched) | A with < 100 primary opportunities | eligible (≥ 100 + valid 40) | < 20 plays in a contrast context | **H1 sample** |
+|---|---|---|---|---|---|
+| WR | 73 | 16 | 57 | 0 | **57** |
+| TE | 28 | 10 | 18 | 1 | **17** |
+| DB | 81 | 25 | 56 | 4 | **52** |
+| DL | 77 | 24 | 53 | 0 | **53** |
+| OL | 73 | 20 | 53 | 0 | **53** |
+
+The ineligibility counts in §3 are over all players with REG rows in a position (A + B; WR 83), so "< 100 opportunities" and "no valid 40" overlap there (WR 4, TE 2, DB 4, DL 5, OL 5).
+
+"Unmatched combine players" in the sense of the requested check is therefore 178 (B + ¬R = 69 + 109): combine participants without a usable predictor–outcome pair.
 
 **Official 40 vs tracked 40:**
 - Every player with a valid tracked 40 has an official 40 (0 exceptions), as §5 states.
@@ -98,7 +134,7 @@
 
 **No discrepancy with the preregistered sample sizes or matching rules.**
 
-**Why players were ineligible** (counts within position):
+**Why players were ineligible** (counts over all players with REG rows in the position, i.e. categories A + B of §1; the categories overlap, see §1):
 
 | | < 100 opportunities | no valid 40 | < 20 plays in a contrast context | other |
 |---|---|---|---|---|
