@@ -93,6 +93,12 @@ Every proposed direction, experiment and final result is judged against all thre
   - Approved title: "Task-Conditioned Translation of Athletic Capacity". Primary = fixed sequence H1-WR (deep vs short) -> H2 (WR deep separation, peak | 40). H1-DB demoted to secondary (power). H5 = OL comparison (secondary).
   - Power: H1-WR MDE delta-rho ~0.30; H2 MDE partial r ~0.6 (power ~0.3 at 0.3); players, not plays, limit power.
 - **Research hypothesis: pre-registered (v1.0). Any change after the first combine x outcome join goes in the protocol's deviations log.**
+- Phase 4 (synthetic validation of the confirmatory pipeline): complete. See:
+  - `research_notes/synthetic_validation.md`, `demand_measure_validation.md`, `selection_bias_analysis.md`, `notebooks/07_synthetic_pipeline_validation.ipynb`;
+  - `src/nfl_bdb/models/{reml,confirmatory,validation_summary}.py`, `src/nfl_bdb/simulation/confirmatory_sim.py`, `src/nfl_bdb/features/demand.py`;
+  - `scripts/run_synthetic_validation.py` + `scripts/phase4_stages.py` (run id 20261121T023847Z), `scripts/build_notebook_07.py`.
+  - Headline: the registered full REML bootstrap is valid but conservative for H1-WR (null size <= 0.0125; power 0.45 at delta 0.2, 0.94 at 0.35). The registered fallback (moment bootstrap) is liberal for WR (0.045) and invalid for DB (0.225). H2 is estimation-only (full support <= 0.035). Fixed-sequence FWER <= 0.02.
+  - Proposed deviations awaiting approval (NOT implemented): D1 retire the fallback; D2 (optional) fix the crossed-design bootstrap; D3 combine-only 40 test-retest + EIV tipping point.
 - Next phase (confirmatory analysis): **not started — awaiting approval.** No combine x game-performance association has been computed.
 
 ## Data facts that must not be forgotten (verified in Phases 1–1.5)
@@ -118,6 +124,13 @@ Every proposed direction, experiment and final result is judged against all thre
 - Pre-registration firewall: never join combine predictors to game outcomes before the confirmatory phase is approved. Verify the confirmatory pipeline on simulated data with planted effects first.
 - Route depth (frozen): deep = GO/POST/CORNER/WHEEL; short = HITCH/SLANT/OUT/FLAT/SCREEN/ANGLE; IN/CROSS excluded as ambiguous.
 - Unit of inference is the **player** (n ≈ 500; 63–77 per position with ≥100 REG plays). Split by player, never by frame or play.
+
+## Phase 4 rules
+
+- The REML player-cluster bootstrap shares team-season columns between duplicated players. This inflates s2_team, shrinks Sigma_b and over-disperses rho* (size <= 0.0125 vs 0.025). Do not "fix" it silently: it is registered.
+- Never use the moment fallback (pooled residualisation) for decisions. Common covariate effects across contexts flip the DB man/zone correlation (-0.33 vs registered +0.36) and bias DB delta by +0.28.
+- Report H1 under selection against the selected-population target: selection on deep-route level inflates the target delta by ~0.04.
+- A play-level CV split is optimistic by ~0.02 in delta-R2, which equals the H2 threshold. Always fold by player.
 
 ## Simulation rules (Phase 1.6)
 

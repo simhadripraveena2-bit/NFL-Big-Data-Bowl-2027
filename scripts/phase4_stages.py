@@ -364,15 +364,25 @@ def stage_demand_sim(out):
 # (Giacomini, Politis & White 2013): a few bootstrap draws per replicate, pooled across replicates to
 # estimate the (centred) bootstrap distribution. Calibrated against the exact full-B moment bootstrap.
 # =================================================================================================
-def run_h1_warp_once(pos, scen, seed, nb=10):
+def run_h1_warp_once(pos, scen, seed, nb=10, subset=None):
+    """subset=None: registered eligible flag (as in the first warp run). subset=dict(min_opp, min_ctx): the rule is
+    re-applied after thinning, exactly as run_h1_once does. scen['empirical']: residuals drawn from the real pool."""
     sk, par = sv._load(pos)
     rng = np.random.default_rng(seed)
     gen = dict(rel_x=scen.get("rel_x", CFG["rel_x"]), r_dep=scen.get("r_dep", CFG["r_dep"]),
                route_confound=scen.get("route_confound", 0.0), sel_outcome=scen.get("sel_outcome", 0.0),
                thin_low=scen.get("thin_low", 1.0), sel_capacity=scen.get("sel_capacity", 0.0))
-    sim, xall, truth, z = cs.simulate_h1(sk, par, scen["rho_h"], scen["rho_l"], rng, **gen)
-    sel = sim["keep"] & sk["eligible"].to_numpy()
+    pool = [sk.filter(pl.col("ctx_i") == c)["resid_within"].to_numpy() for c in (0, 1)] if scen.get("empirical") else None
+    sim, xall, truth, z = cs.simulate_h1(sk, par, scen["rho_h"], scen["rho_l"], rng, resid_pool=pool, **gen)
+    if subset is None:
+        sel = sim["keep"] & sk["eligible"].to_numpy()
+    else:
+        sel = sim["keep"] & (sk["opp"].to_numpy() >= subset.get("min_opp", 0))
     sub = sk.filter(pl.Series(sel)).with_columns(pl.Series("y", sim["y"][sel]))
+    if subset is not None:
+        c = sub.group_by("pid", "ctx_i").len().pivot(index="pid", on="ctx_i", values="len").fill_null(0)
+        okp = c.filter((pl.col("0") >= subset["min_ctx"]) & (pl.col("1") >= subset["min_ctx"]))["pid"]
+        sub = sub.filter(pl.col("pid").is_in(okp.implode()))
     pids = np.unique(sub["pid"].to_numpy()); pmap = -np.ones(int(sk["pid"].max()) + 1, int); pmap[pids] = np.arange(len(pids))
     _, team = np.unique(sub["team_i"].to_numpy(), return_inverse=True)
     player = pmap[sub["pid"].to_numpy()]; ctx = sub["ctx_i"].to_numpy(); y = sub["y"].to_numpy(); x = xall[pids]
@@ -407,6 +417,21 @@ def stage_h1_warp(out):
     pl.DataFrame(rows, infer_schema_length=None).write_parquet(out / "h1_warp.parquet")
 
 
+def stage_h1_warp_extra(out):
+    """Full-REML warp check for the remaining H1-WR null scenarios: S6 differential reliability (registered >= 20/ctx
+    rule re-applied after thinning, same datasets as h1_WR_s8fix) and S1 with empirical residuals (same datasets as h1_WR S10)."""
+    rows = []
+    scen = {s[0]: s for s in sv.H1_SCENARIOS}
+    for sid, subset in ((8, dict(min_opp=100, min_ctx=20)), (10, None)):
+        _, label, sc = scen[sid]
+        sc = {k: v for k, v in sc.items() if k != "subset"}
+        jobs = [(run_h1_warp_once, dict(pos="WR", scen=sc, seed=sv._seed(sid, r), subset=subset)) for r in range(CFG["n_rep_h1"])]
+        t0 = time.time(); res = sv.run_parallel(jobs)
+        rows += [dict(scenario=sid, label=label, rep=r, **x) for r, x in enumerate(res)]
+        print("WARP-EXTRA", sid, f"{time.time() - t0:.0f}s", flush=True)
+    pl.DataFrame(rows, infer_schema_length=None).write_parquet(out / "h1_warp_extra.parquet")
+
+
 def warp_decisions(df: pl.DataFrame, est: str, boots: str, alpha=0.05):
     """Warp-speed percentile CI: Delta_hat_r + quantiles of the pooled centred draws (Delta*_rb - Delta_hat_r)."""
     out = []
@@ -422,6 +447,61 @@ def warp_decisions(df: pl.DataFrame, est: str, boots: str, alpha=0.05):
                         coverage95=float(cov.mean()), boot_sd=float(cen.std()), sd_estimate=float(d.std(ddof=1)),
                         bias=float((d - tr).mean())))
     return pl.DataFrame(out)
+
+
+def warp_pvalues(df: pl.DataFrame, est: str, boots: str) -> pl.DataFrame:
+    """Per-replicate two-sided percentile-bootstrap p-values from the warp-speed pooled centred distribution:
+    p_r = 2 min(P*(Delta_hat_r + c <= 0), P*(Delta_hat_r + c >= 0)), with c the pooled centred draws of the scenario.
+    p_r < alpha  <=>  the warp 95% percentile CI excludes 0 (up to ties), so Holm / fixed-sequence can use it."""
+    out = []
+    for key, g in df.group_by(["scenario", "label"], maintain_order=True):
+        cen = np.sort(np.concatenate([np.asarray(b) - e for b, e in zip(g[boots].to_list(), g[est].to_list())]))
+        cen = cen[np.isfinite(cen)]
+        d = g[est].to_numpy()
+        lo = np.searchsorted(cen, -d, side="right") / len(cen)       # P*(d + c <= 0)
+        hi = 1 - np.searchsorted(cen, -d, side="left") / len(cen)    # P*(d + c >= 0)
+        p = np.minimum(1.0, 2 * np.minimum(lo, hi))
+        out.append(g.select("scenario", "label", "rep", est).with_columns(pl.Series("p_warp", p)))
+    return pl.concat(out)
+
+
+def stage_h1_warp_db(out):
+    """Warp-speed REML bootstrap for H1-DB (secondary), same datasets as h1_DB.parquet scenarios 1 and 4."""
+    rows = []
+    scen = {s[0]: s for s in sv.H1_SCENARIOS}
+    for sid in (1, 4):
+        _, label, sc = scen[sid]
+        sc = {k: v for k, v in sc.items() if k != "subset"}
+        jobs = [(run_h1_warp_once, dict(pos="DB", scen=sc, seed=sv._seed(sid + 100, r))) for r in range(200)]
+        t0 = time.time(); res = sv.run_parallel(jobs)
+        rows += [dict(scenario=sid, label=label, rep=r, **x) for r, x in enumerate(res)]
+        print("WARP-DB", sid, f"{time.time() - t0:.0f}s", flush=True)
+    pl.DataFrame(rows, infer_schema_length=None).write_parquet(out / "h1_warp_DB.parquet")
+
+
+def stage_family_reml(out):
+    """FWER / power of fixed sequence and Holm with the registered *full REML* bootstrap for H1 (warp-speed p-values)
+    and the registered H2 test. Independent replicates are paired by index (the hypotheses are simulated independently)."""
+    wr = warp_pvalues(pl.read_parquet(out / "h1_warp.parquet"), "delta_reml", "reml_boot")
+    db = warp_pvalues(pl.read_parquet(out / "h1_warp_DB.parquet"), "delta_reml", "reml_boot")
+    h2 = pl.read_parquet(out / "h2.parquet")
+    combos = [("global null", 1, 1, 1), ("H1-WR large, H2 null", 5, 1, 1), ("H1-WR moderate, H2 partial 0.3", 4, 1, 4),
+              ("H1-WR large, H2 partial 0.3", 5, 1, 4), ("H1-WR large, H2 partial 0.4", 5, 1, 5),
+              ("H1-WR null, H2 partial 0.4", 1, 1, 5), ("H1-WR moderate, DB moderate, H2 null", 4, 4, 1)]
+    rows = []
+    for label, a, b, c in combos:
+        A = wr.filter(pl.col("scenario") == a).sort("rep"); Bd = db.filter(pl.col("scenario") == b).sort("rep")
+        H = h2.filter(pl.col("scenario") == c).sort("rep")
+        n = min(A.height, Bd.height, H.height)
+        for k in range(n):
+            t1 = dict(p=A["p_warp"][k], direction_ok=A["delta_reml"][k] > 0)
+            tdb = dict(p=Bd["p_warp"][k], direction_ok=Bd["delta_reml"][k] > 0)
+            t2 = dict(p=H["p"][k], direction_ok=H["beta_P_reml"][k] > 0)
+            fs = cf.fixed_sequence([t1, t2], CFG["alpha"]); ho = cf.holm([t1, tdb, t2], CFG["alpha"])
+            rows.append(dict(combo=label, rep=k, fs_h1=fs[0], fs_h2=fs[1], fs_h2_supported=fs[1] and bool(H["h2_supported_if_reached"][k]),
+                             holm_h1=ho[0], holm_db=ho[1], holm_h2=ho[2], any_fs=any(fs), any_holm=any(ho)))
+    pl.DataFrame(rows).write_parquet(out / "family_reml.parquet")
+    print("family_reml done", flush=True)
 
 
 def stage_h1_s8fix(out):
@@ -464,3 +544,91 @@ def stage_h1_direct(out):
         rows += [dict(scenario=sid, label=label, rep=r, **x) for r, x in enumerate(res)]
         print("DIRECT", sid, f"{time.time() - t0:.0f}s", flush=True)
     pl.DataFrame(rows, infer_schema_length=None).write_parquet(out / "h1_direct.parquet")
+
+
+def selection_reml_approx(sel: pl.DataFrame, warp: pl.DataFrame, alpha=0.05) -> pl.DataFrame:
+    """Approximate full-REML-bootstrap decisions for the selection grid: each replicate's REML Delta_hat is combined
+    with the pooled centred REML-bootstrap quantiles of the matching warp scenario (null design -> S1, moderate -> S3).
+    This transfers the bootstrap *shape* across eligibility rules, so it is labelled an approximation."""
+    q = {}
+    for sid in (1, 4):
+        g = warp.filter(pl.col("scenario") == sid)
+        cen = np.concatenate([np.asarray(b) - e for b, e in zip(g["reml_boot"].to_list(), g["delta_reml"].to_list())])
+        q[sid] = np.percentile(cen[np.isfinite(cen)], [100 * alpha / 2, 100 * (1 - alpha / 2)])
+    rows = []
+    for (mid, mech, rule), g in sel.group_by(["mech", "mechanism", "rule"], maintain_order=True):
+        lo, hi = q[1 if mid <= 3 else 4]
+        d = g["delta_reml"].to_numpy(); tr = g["true_delta_obs"].to_numpy()
+        rej = (d > 0) & (d + lo > 0); cov = (d + lo <= tr) & (d + hi >= tr)
+        rows.append(dict(mech=mid, mechanism=mech, rule=rule, reps=g.height, reject_reml_approx=float(rej.mean()),
+                         reject_mcse=float(np.sqrt(rej.mean() * (1 - rej.mean()) / g.height)), coverage_reml_approx=float(cov.mean())))
+    return pl.DataFrame(rows)
+
+
+def selection_effective_truth(n_draw=4000, seed=4404) -> pl.DataFrame:
+    """Finite-population target of H1-WR under each selection mechanism and eligibility rule: the expected
+    within-subset Delta_eff = corr(x_obs, l_h) - corr(x_obs, l_l) over the players a rule retains, using the same
+    latent generator as cs.simulate_h1 (no outcome noise; no fitting). Bias of an estimator relative to its
+    *selected-population* target = mean estimate - Delta_eff; the remainder of (Delta_eff - nominal) is estimand shift."""
+    sk, par = sv._load("WR")
+    pp = sk.group_by("pid").agg(pl.col("dep_std").first(), pl.col("lr_std").first(), pl.col("go_share_std").first()).sort("pid")
+    dep = pp["dep_std"].to_numpy(); lr = pp["lr_std"].to_numpy(); P = len(dep)
+    cnt = sk.group_by("pid", "ctx_i").len().pivot(index="pid", on="ctx_i", values="len").fill_null(0).sort("pid")
+    opp = sk.group_by("pid").agg(pl.col("opp").first()).sort("pid")["opp"].to_numpy()
+    n0 = cnt["0"].to_numpy(); n1 = cnt["1"].to_numpy()
+    subsets = {r: (opp >= v.get("min_opp", 0)) & (n0 >= v["min_ctx"]) & (n1 >= v["min_ctx"]) for r, v in SEL_RULES.items()}
+    Sb = np.asarray(par["sigma_b"])
+    c_true = Sb[0, 1] / np.sqrt(Sb[0, 0] * Sb[1, 1])
+    rng = np.random.default_rng(seed); rows = []
+    for mid, mlabel, sc in SEL_MECH:
+        rh, rl = sc["rho_h"], sc["rho_l"]; so = sc.get("sel_outcome", 0.0); scap = sc.get("sel_capacity", 0.0)
+        ru = cs._ru(c_true, rh, rl); acc = {r: [] for r in subsets}
+        for _ in range(n_draw):
+            z = CFG["r_dep"] * dep + np.sqrt(1 - CFG["r_dep"] ** 2) * rng.standard_normal(P)
+            if scap:
+                z = (z + scap * lr) / np.sqrt(1 + scap ** 2)
+            u1 = rng.standard_normal(P)
+            if so:
+                u1 = (u1 + so * lr) / np.sqrt(1 + so ** 2)
+            u2 = ru * u1 + np.sqrt(1 - ru ** 2) * rng.standard_normal(P)
+            l1 = rh * z + np.sqrt(1 - rh ** 2) * u1; l2 = rl * z + np.sqrt(1 - rl ** 2) * u2
+            x = np.sqrt(CFG["rel_x"]) * z + np.sqrt(1 - CFG["rel_x"]) * rng.standard_normal(P)
+            for r, m in subsets.items():
+                acc[r].append(np.corrcoef(x[m], l1[m])[0, 1] - np.corrcoef(x[m], l2[m])[0, 1])
+        for r, v in acc.items():
+            rows.append(dict(mech=mid, mechanism=mlabel, rule=r, n_players=int(subsets[r].sum()),
+                             nominal_delta_obs=(rh - rl) * np.sqrt(CFG["rel_x"]), delta_eff=float(np.mean(v))))
+    return pl.DataFrame(rows)
+
+
+def bootstrap_mechanism_diagnostic(reps=3, B=40, scenario=1) -> pl.DataFrame:
+    """Why the registered REML player bootstrap is over-dispersed: in resamples, duplicated players share their
+    team-season columns and have identical plays, so REML moves between-player variance into the team-season
+    variance. Reports full-data vs bootstrap-mean s2_team and Sigma_b, and the bootstrap SD of Delta."""
+    sk, par = sv._load("WR")
+    _, _, sc = [s for s in sv.H1_SCENARIOS if s[0] == scenario][0]
+    rows = []
+    for r in range(reps):
+        rng = np.random.default_rng(sv._seed(scenario, r))
+        sim, xall, truth, z = cs.simulate_h1(sk, par, sc["rho_h"], sc["rho_l"], rng, rel_x=CFG["rel_x"], r_dep=CFG["r_dep"])
+        sel = sim["keep"] & sk["eligible"].to_numpy()
+        sub = sk.filter(pl.Series(sel)).with_columns(pl.Series("y", sim["y"][sel]))
+        pids = np.unique(sub["pid"].to_numpy()); pmap = -np.ones(int(sk["pid"].max()) + 1, int); pmap[pids] = np.arange(len(pids))
+        _, team = np.unique(sub["team_i"].to_numpy(), return_inverse=True)
+        player = pmap[sub["pid"].to_numpy()]; ctx = sub["ctx_i"].to_numpy(); y = sub["y"].to_numpy(); x = xall[pids]
+        Xw, _ = sv._design(sub, "WR")
+        f = cf.h1_reml(player, ctx, team, y, Xw, x)
+        P = len(x); order = np.argsort(player, kind="stable"); bnd = np.searchsorted(player[order], np.arange(P + 1))
+        rows_of = [order[bnd[i]:bnd[i + 1]] for i in range(P)]
+        brng = np.random.default_rng(99 + r); st = []
+        for _ in range(B):
+            pick = brng.integers(0, P, P); idx = np.concatenate([rows_of[i] for i in pick])
+            newp = np.concatenate([np.full(len(rows_of[i]), k) for k, i in enumerate(pick)])
+            _, tn = np.unique(team[idx], return_inverse=True); Xb = Xw[idx]; Xb = Xb[:, np.abs(Xb).sum(0) > 0]
+            rb = cf.h1_reml(newp, ctx[idx], tn, y[idx], Xb, x[pick], start=f.extra["theta"])
+            st.append((rb.delta, rb.s2_team, rb.sigma_b[0, 0], rb.sigma_b[1, 1]))
+        st = np.array(st)
+        rows.append(dict(rep=r, delta=f.delta, s2_team=f.s2_team, sb_hh=f.sigma_b[0, 0], sb_ll=f.sigma_b[1, 1],
+                         boot_mean_s2_team=st[:, 1].mean(), boot_mean_sb_hh=st[:, 2].mean(), boot_mean_sb_ll=st[:, 3].mean(),
+                         boot_sd_delta=st[:, 0].std(), sampling_sd_delta_S1=0.112))
+    return pl.DataFrame(rows)

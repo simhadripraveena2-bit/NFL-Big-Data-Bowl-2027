@@ -16,7 +16,7 @@ Nuisance parameters come from outcome-only REML fits.
 
 How to reproduce:
 1. Run `python scripts/run_synthetic_validation.py skeleton`.
-2. Run each stage, `h1 h1_db h2 selection family selection_real demand_real demand_reliability demand_sim h1_s8fix h1_warp`, with a common run id.
+2. Run each stage, `h1 h1_db h2 selection family selection_real demand_real demand_reliability demand_sim h1_s8fix h1_warp h1_direct h1_warp_db family_reml`, with a common run id. Then run `python scripts/db_correlation_decomposition.py`.
 3. Run `python scripts/build_notebook_07.py`, then execute this notebook.
 
 Seeds come from `SeedSequence([4004, scenario, replicate])`.""")
@@ -46,6 +46,8 @@ S1.select('scenario','label','reps','true_delta_obs','reject','reject_mcse','rej
 code("""warp_path = OUT / 'h1_warp.parquet'
 if warp_path.exists():
     W = pl.read_parquet(warp_path)
+    if (OUT / 'h1_warp_extra.parquet').exists():
+        W = pl.concat([W, pl.read_parquet(OUT / 'h1_warp_extra.parquet')], how='diagonal_relaxed')
     WR = pl.concat([ps.warp_decisions(W, 'delta_reml', 'reml_boot'), ps.warp_decisions(W, 'delta_moment', 'moment_boot')])
     exact = W.group_by('scenario').agg(pl.col('supported_full_moment').mean().alias('exact_full_B_moment_reject')).sort('scenario')
     display(WR.sort('scenario','estimator').join(exact, on='scenario'))""")
@@ -81,7 +83,7 @@ if direct.exists():
     W = pl.read_parquet(OUT / 'h1_warp.parquet').select('scenario','rep', pl.col('delta_reml').alias('d_warp'), 'reml_boot')
     J = D.join(W, on=['scenario','rep'])
     rows = []
-    for s, g in J.group_by('scenario', maintain_order=True):
+    for (s,), g in J.group_by('scenario', maintain_order=True):
         allw = W.filter(pl.col('scenario') == s)
         cen = np.concatenate([np.asarray(b) - e for b, e in zip(allw['reml_boot'].to_list(), allw['d_warp'].to_list())])
         qlo = np.percentile(cen, 2.5)
@@ -93,8 +95,15 @@ if direct.exists():
                          corr_lower_bounds=float(np.corrcoef(g['ci_lo'], warp_lo)[0, 1]),
                          mean_lower_bound_diff=float((g['ci_lo'] - warp_lo).mean())))
     display(pl.DataFrame(rows))""")
+md("""**Why the full REML bootstrap is conservative (mechanism).** A resampled player drawn twice contributes two identical copies of his plays on the same team-season. REML attributes their perfect agreement partly to the team-season effect: s2_team inflates and Σ_b shrinks, so ρ_c = β_c / √(β_c² + Σ_b,cc) becomes more variable across resamples. Three replicates of S1, 40 resamples each (about 1 minute):""")
+code("""ps.bootstrap_mechanism_diagnostic(reps=3, B=40)""")
 code("""db = summarise_h1(pl.read_parquet(OUT / 'h1_DB.parquet'))
 db.select('scenario','label','reps','reject','reject_mcse','bias_reml','coverage95','sd_delta_reml','mean_se_boot')""")
+md("""**H1-DB under the full REML bootstrap (warp-speed).** The registered fallback (moment bootstrap with pooled residualisation) is misspecified for DB, as the decomposition below shows.""")
+code("""wdb = OUT / 'h1_warp_DB.parquet'
+if wdb.exists():
+    WD = pl.read_parquet(wdb)
+    display(pl.concat([ps.warp_decisions(WD, 'delta_reml', 'reml_boot'), ps.warp_decisions(WD, 'delta_moment', 'moment_boot')]).sort('scenario', 'estimator'))""")
 md("### DB: why the man / underneath-zone player correlation changed sign (outcome-only, real data)")
 code("""pl.Config.set_fmt_str_lengths(70)
 pl.read_parquet(OUT / 'db_corr_decomposition.parquet').filter(pl.col('data').str.starts_with('registered'))""")
@@ -114,10 +123,24 @@ for k, s in enumerate([1, 4, 5]):
 ax[1].axvline(0.02, color=style.MUTED, ls='--'); ax[1].set_xlabel('ΔR²_CV (held-out players)'); ax[1].legend(); ax[1].set_title('Incremental predictive value')
 fig.tight_layout(); fig.savefig(FIG / 'p4_h2.png', dpi=150); plt.show()""")
 code("""S2.select('scenario','label','mean_dr2_player_cv_same_reps','mean_dr2_playsplit')""")
+md("""### H2: precision artefact versus new information (population calculation)
+If separation depends only on true 40 speed (validity *a*), a noisy official 40 (reliability R_F) leaves a non-zero partial correlation between separation and the more precise tracked peak. That partial is precision, not new information.""")
+code("""rows = []
+for a in (0.3, 0.6):
+    for RF in (0.80, 0.85, 0.90, 0.95, 0.99):
+        Rx = 0.987; r = min(0.814 / np.sqrt(RF * Rx), 0.99)
+        C = np.array([[1, np.sqrt(RF*Rx)*r, np.sqrt(RF)*a], [np.sqrt(RF*Rx)*r, 1, np.sqrt(Rx)*r*a], [np.sqrt(RF)*a, np.sqrt(Rx)*r*a, 1]])
+        P = np.linalg.inv(C)
+        rows.append(dict(validity_of_40=a, R_F=RF, latent_corr_40_peak=r, spurious_partial=-P[1, 2] / np.sqrt(P[1, 1] * P[2, 2])))
+pl.DataFrame(rows)""")
 md("## 3. Sequential testing exactly as registered, and Holm separately")
 code("""fam = pl.read_parquet(OUT / 'family.parquet')
 fam.group_by('combo', maintain_order=True).agg(pl.len().alias('reps'), pl.col('fs_h1').mean(), pl.col('fs_h2').mean(), pl.col('fs_h2_supported').mean(),
     pl.col('any_fs').mean().alias('P(any fixed-seq rejection)'), pl.col('holm_h1').mean(), pl.col('holm_db').mean(), pl.col('holm_h2').mean(), pl.col('any_holm').mean().alias('P(any Holm rejection)'))""")
+code("""fr = OUT / 'family_reml.parquet'
+if fr.exists():
+    display(pl.read_parquet(fr).group_by('combo', maintain_order=True).agg(pl.len().alias('reps'), pl.col('fs_h1').mean(), pl.col('fs_h2').mean(), pl.col('fs_h2_supported').mean(),
+        pl.col('any_fs').mean().alias('P(any fixed-seq rejection)'), pl.col('holm_h1').mean(), pl.col('holm_db').mean(), pl.col('holm_h2').mean(), pl.col('any_holm').mean().alias('P(any Holm rejection)')))""")
 md("## 4. Selection: the eligibility threshold")
 code("""sel = pl.read_parquet(OUT / 'selection.parquet')
 SS = summarise_h1(sel)
@@ -132,11 +155,22 @@ for k, mid in enumerate([1, 2, 3, 4, 5, 6]):
 ax.axhline(0, color=style.MUTED, lw=1); ax.set_xticks(range(4), [r.split(':')[0] for r in rules], fontsize=8); ax.set_ylabel('bias of REML Δ̂')
 ax.legend(fontsize=7, ncol=2); ax.set_title('Selection: bias of H1-WR under eligibility rules')
 fig.tight_layout(); fig.savefig(FIG / 'p4_selection.png', dpi=150); plt.show()""")
+code("""ps.selection_reml_approx(sel, pl.read_parquet(OUT / 'h1_warp.parquet')).sort('mech', 'rule')""")
+md("""**Estimand shift vs estimator bias.** Δ_eff is the expected Δ among the players a rule retains, from the same latent generator with no outcome noise. Estimator bias is measured against Δ_eff. The remainder (Δ_eff − nominal) is a change of target population, not an error.""")
+code("""tgt = ps.selection_effective_truth(4000)
+tgt.join(SS.select('mech','rule','mean_delta_reml','mean_delta_moment'), on=['mech','rule']).with_columns(
+    (pl.col('delta_eff') - pl.col('nominal_delta_obs')).alias('estimand_shift'),
+    (pl.col('mean_delta_reml') - pl.col('delta_eff')).alias('reml_bias_vs_target'),
+    (pl.col('mean_delta_moment') - pl.col('delta_eff')).alias('moment_bias_vs_target')).sort('mech','rule')""")
 code("""pl.read_parquet(OUT / 'selection_real.parquet')""")
 md("## 5. Demand definition (real game speeds only; no combine data)")
 code("""cells = pl.read_parquet(OUT / 'demand_cells.parquet')
 cells.filter(pl.col('min_plays') == 1).pivot(index=['pos','ctx'], on='def', values='D').sort('pos','ctx')""")
 code("""pl.read_parquet(OUT / 'demand_threshold_agreement.parquet').sort('pos','ctx')""")
+code("""from scipy.stats import spearmanr
+wide = cells.filter(pl.col('min_plays') == 1).pivot(index=['pos','ctx'], on='def', values='D')
+pl.DataFrame([dict(pair=f'{a} vs {b}', spearman_over_11_cells=spearmanr(wide[a], wide[b]).statistic)
+              for a, b in [('share_85','share_90'), ('share_90','share_95'), ('share_85','share_95'), ('share_90','share_abs')]])""")
 code("""rel = pl.read_parquet(OUT / 'demand_reliability.parquet')
 rel.pivot(index=['pos','ctx','n'], on='threshold', values='spearman_brown').sort('pos','ctx')""")
 code("""xf = pl.read_parquet(OUT / 'demand_crossfit.parquet')
