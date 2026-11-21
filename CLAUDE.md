@@ -87,8 +87,13 @@ Every proposed direction, experiment and final result is judged against all thre
   - `scripts/run_phase3_screening.py` (stages `features`, `analyse`).
   - Recommended (awaiting approval): H1 demand-moderated speed translation + H2 WR deep-route separation; H5 (OL) as negative control; H3 (DL) and H4 (DB) exploratory.
   - No combine x game-performance association has been computed yet. Pre-register before the first join.
-- **Research hypothesis: NOT finalised — awaiting approval.**
-- Next phase: **not started — awaiting approval.** No NFL performance outcomes used so far.
+- Phase 3.5 (pre-registration + power): complete. See:
+  - `research_notes/preregistration.md` (frozen protocol v1.0), `statistical_model_specification.md`, `power_analysis.md`, `notebooks/06_power_analysis.ipynb`;
+  - `scripts/run_power_analysis.py`, `src/nfl_bdb/models/power.py`, `src/nfl_bdb/data/play_table.py` (frozen contexts/covariates).
+  - Approved title: "Task-Conditioned Translation of Athletic Capacity". Primary = fixed sequence H1-WR (deep vs short) -> H2 (WR deep separation, peak | 40). H1-DB demoted to secondary (power). H5 = OL comparison (secondary).
+  - Power: H1-WR MDE delta-rho ~0.30; H2 MDE partial r ~0.6 (power ~0.3 at 0.3); players, not plays, limit power.
+- **Research hypothesis: pre-registered (v1.0). Any change after the first combine x outcome join goes in the protocol's deviations log.**
+- Next phase (confirmatory analysis): **not started — awaiting approval.** No combine x game-performance association has been computed.
 
 ## Data facts that must not be forgotten (verified in Phases 1–1.5)
 
@@ -110,6 +115,8 @@ Every proposed direction, experiment and final result is judged against all thre
 - `separation_at_pass_forward` exists for all routes on thrown passes (not sacks or scrambles) and is reproduced exactly from tracking. There is no DB coverage-performance outcome.
 - Context adjustment removes much apparent player signal (WR short-route separation reliability 0.75 -> 0.22). Always report adjusted reliability.
 - In DL, forty / 10-yd split / peak speed / weight are one dimension (|rho| 0.80-0.97): no incremental-over-40 test is possible.
+- Pre-registration firewall: never join combine predictors to game outcomes before the confirmatory phase is approved. Verify the confirmatory pipeline on simulated data with planted effects first.
+- Route depth (frozen): deep = GO/POST/CORNER/WHEEL; short = HITCH/SLANT/OUT/FLAT/SCREEN/ANGLE; IN/CROSS excluded as ambiguous.
 - Unit of inference is the **player** (n ≈ 500; 63–77 per position with ≥100 REG plays). Split by player, never by frame or play.
 
 ## Simulation rules (Phase 1.6)
