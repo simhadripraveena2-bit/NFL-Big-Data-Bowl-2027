@@ -433,3 +433,34 @@ def stage_h1_s8fix(out):
     res = sv.run_parallel(jobs)
     pl.DataFrame([dict(pos="WR", scenario=8, label=label + " [registered >=20/ctx after thinning]", rep=r, **x) for r, x in enumerate(res)],
                  infer_schema_length=None).write_parquet(out / "h1_WR_s8fix.parquet")
+
+
+def run_h1_direct_once(pos, scen, seed, B=400):
+    """Direct (non-warp) registered REML player bootstrap with B draws for one replicate; same dataset as
+    run_h1_warp_once / run_h1_once for this seed (the simulation consumes the same RNG stream)."""
+    sk, par = sv._load(pos)
+    rng = np.random.default_rng(seed)
+    sim, xall, truth, z = cs.simulate_h1(sk, par, scen["rho_h"], scen["rho_l"], rng, rel_x=CFG["rel_x"], r_dep=scen.get("r_dep", CFG["r_dep"]),
+                                         route_confound=scen.get("route_confound", 0.0))
+    sel = sim["keep"] & sk["eligible"].to_numpy()
+    sub = sk.filter(pl.Series(sel)).with_columns(pl.Series("y", sim["y"][sel]))
+    pids = np.unique(sub["pid"].to_numpy()); pmap = -np.ones(int(sk["pid"].max()) + 1, int); pmap[pids] = np.arange(len(pids))
+    _, team = np.unique(sub["team_i"].to_numpy(), return_inverse=True)
+    player = pmap[sub["pid"].to_numpy()]; ctx = sub["ctx_i"].to_numpy(); y = sub["y"].to_numpy(); x = xall[pids]
+    Xw, _ = sv._design(sub, pos)
+    reml = cf.h1_reml(player, ctx, team, y, Xw, x)
+    bt = cf.h1_reml_bootstrap(player, ctx, team, y, Xw, x, B, np.random.default_rng(seed + 7), start=reml.extra["theta"])
+    return dict(delta_reml=reml.delta, ci_lo=bt["ci"][0], ci_hi=bt["ci"][1], se=bt["se"], n_ok=bt["n_ok"],
+                true_delta_obs=truth.delta_obs_scale, boot_q=list(map(float, np.percentile(bt["boot"], [2.5, 5, 50, 95, 97.5]))))
+
+
+def stage_h1_direct(out):
+    rows = []
+    scen = {s[0]: s for s in sv.H1_SCENARIOS}
+    for sid, nrep in ((1, 60), (6, 40)):
+        _, label, sc = scen[sid]
+        jobs = [(run_h1_direct_once, dict(pos="WR", scen=sc, seed=sv._seed(sid, r))) for r in range(nrep)]
+        t0 = time.time(); res = sv.run_parallel(jobs)
+        rows += [dict(scenario=sid, label=label, rep=r, **x) for r, x in enumerate(res)]
+        print("DIRECT", sid, f"{time.time() - t0:.0f}s", flush=True)
+    pl.DataFrame(rows, infer_schema_length=None).write_parquet(out / "h1_direct.parquet")

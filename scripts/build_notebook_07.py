@@ -75,8 +75,29 @@ for p, c in zip(bp['boxes'], cols): p.set_facecolor(c); p.set_alpha(0.55)
 ax.axhline(0, color=style.MUTED, lw=1); ax.set_xticks(range(1, len(labels)+1), labels, fontsize=7); ax.set_ylabel('estimate − truth')
 ax.set_title('H1-WR: estimation error by scenario (REML = registered point estimate)')
 fig.tight_layout(); fig.savefig(FIG / 'p4_h1_bias.png', dpi=150); plt.show()""")
+code("""direct = OUT / 'h1_direct.parquet'
+if direct.exists():
+    D = pl.read_parquet(direct)
+    W = pl.read_parquet(OUT / 'h1_warp.parquet').select('scenario','rep', pl.col('delta_reml').alias('d_warp'), 'reml_boot')
+    J = D.join(W, on=['scenario','rep'])
+    rows = []
+    for s, g in J.group_by('scenario', maintain_order=True):
+        allw = W.filter(pl.col('scenario') == s)
+        cen = np.concatenate([np.asarray(b) - e for b, e in zip(allw['reml_boot'].to_list(), allw['d_warp'].to_list())])
+        qlo = np.percentile(cen, 2.5)
+        warp_lo = g['delta_reml'].to_numpy() + qlo
+        rows.append(dict(scenario=s, reps=g.height, same_point_estimate=bool(np.allclose(g['delta_reml'], g['d_warp'])),
+                         direct_reject=float(((g['ci_lo'] > 0) & (g['delta_reml'] > 0)).mean()),
+                         direct_coverage=float(((g['ci_lo'] <= g['true_delta_obs']) & (g['ci_hi'] >= g['true_delta_obs'])).mean()),
+                         mean_direct_se=float(g['se'].mean()), pooled_warp_sd=float(cen.std()),
+                         corr_lower_bounds=float(np.corrcoef(g['ci_lo'], warp_lo)[0, 1]),
+                         mean_lower_bound_diff=float((g['ci_lo'] - warp_lo).mean())))
+    display(pl.DataFrame(rows))""")
 code("""db = summarise_h1(pl.read_parquet(OUT / 'h1_DB.parquet'))
 db.select('scenario','label','reps','reject','reject_mcse','bias_reml','coverage95','sd_delta_reml','mean_se_boot')""")
+md("### DB: why the man / underneath-zone player correlation changed sign (outcome-only, real data)")
+code("""pl.Config.set_fmt_str_lengths(70)
+pl.read_parquet(OUT / 'db_corr_decomposition.parquet').filter(pl.col('data').str.starts_with('registered'))""")
 md("## 2. H2: incremental value of tracked peak speed beyond the official 40")
 code("""h2 = pl.read_parquet(OUT / 'h2.parquet'); S2 = summarise_h2(h2)
 S2.select('scenario','label','reps','true_partial','reject','reject_mcse','reject_holm','reject_wald_reml','full_support','mean_partial_hat','bias_partial','sd_partial_hat',
