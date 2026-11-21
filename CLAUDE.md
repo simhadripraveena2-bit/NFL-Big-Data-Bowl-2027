@@ -103,7 +103,8 @@ Every proposed direction, experiment and final result is judged against all thre
 - **The single combine x outcome join has been performed** (run 20261121T135032Z, `scripts/run_confirmatory_join.py`, outputs in `data/interim/confirmatory_join/`). See `research_notes/join_validation_report.md`: all registered sample sizes reproduced, 0 duplicates, raw unchanged.
 - D4 approved (Option A): H2 demoted to secondary, estimation-focused (logged in §15). Hierarchy: H1-WR sole primary; H2 secondary estimation; Holm secondary family {H1-DB, H1-DL(a), H1-DL(b), H5(b)} unchanged; H5(a)/(c), H1-global estimation; TE descriptive.
 - Pre-model audit passed (`research_notes/pre_model_audit.md`, `scripts/run_pre_model_audit.py`): frozen code unchanged, single join unchanged, rules re-verified, sample sizes = registered.
-- Confirmatory models: **not fitted — awaiting approval.** No combine x outcome association has been computed or inspected.
+- **H1-WR confirmatory analysis done (run 20261121T223645Z, commit 8674e80, seed 4004, B = 2000): INCONCLUSIVE.** Delta = 0.090 (rho deep 0.576 / short 0.486), 95% CI [-0.089, 0.400], SE 0.122, p = 0.211; 2025 season-forward same sign (0.219); not falsified (90% upper 0.333 > 0.15). Equal raw slopes (~0.11 yd/s per 0.25 yd/s). See `research_notes/h1_wr_confirmatory_results.md`, notebook 08. The runner refuses a second run.
+- Secondary analyses (H2, Holm family, H5, TE) and the H1-WR robustness grid: **not run — awaiting review.**
 - Confirmatory H1 must use `confirmatory.h1_registered_test` (full REML bootstrap, B = 2000). Never `h1_procedure`.
 
 ## Data facts that must not be forgotten (verified in Phases 1–1.5)

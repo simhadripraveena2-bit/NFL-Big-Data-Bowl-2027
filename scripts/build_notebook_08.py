@@ -25,7 +25,7 @@ import numpy as np, polars as pl, matplotlib.pyplot as plt
 ROOT = Path.cwd().parent if Path.cwd().name == 'notebooks' else Path.cwd()
 sys.path.insert(0, str(ROOT / 'src'))
 from nfl_bdb.visualization import style
-style.apply()
+style.apply(); pl.Config.set_tbl_rows(40); pl.Config.set_fmt_str_lengths(60)
 import os
 OUT = Path(os.environ['H1_OUT']) if os.environ.get('H1_OUT') else ROOT / 'experiments/h1_wr_confirmatory' / (ROOT / 'experiments/h1_wr_confirmatory/LATEST').read_text().strip()
 RUN = OUT.name
