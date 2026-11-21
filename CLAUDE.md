@@ -82,6 +82,11 @@ Every proposed direction, experiment and final result is judged against all thre
     - Game A0: not measurable (implausible values grow with exposure).
     - D99 braking and C99 lateral envelopes: robust, but they are demonstrated, context-dependent envelopes, not capacities.
     - CCMT execution cost: not yet valid on real combine data (timing validity, non-identifiable limits, weak reliability; shuttle unusable).
+- Phase 3 (performance-linkage discovery, outcome-blind screening): complete. See:
+  - `research_notes/game_outcome_inventory.md`, `position_specific_metrics.md`, `temporal_matching_report.md`, `phase3_hypothesis_screening.md`;
+  - `scripts/run_phase3_screening.py` (stages `features`, `analyse`).
+  - Recommended (awaiting approval): H1 demand-moderated speed translation + H2 WR deep-route separation; H5 (OL) as negative control; H3 (DL) and H4 (DB) exploratory.
+  - No combine x game-performance association has been computed yet. Pre-register before the first join.
 - **Research hypothesis: NOT finalised — awaiting approval.**
 - Next phase: **not started — awaiting approval.** No NFL performance outcomes used so far.
 
@@ -100,6 +105,11 @@ Every proposed direction, experiment and final result is judged against all thre
 - Game A0 by binning is implausible (> 15 yd/s²) for 22% of high-exposure players. Use robust peak-speed measures for game speed capacity.
 - Real combine drill timing from tracking: 3-cone r = 0.65 with official time; shuttle r = 0.40 and not repeatable.
 - Within-position reliability must be reported; pooled reliabilities are inflated by position differences.
+- Outcomes are **REG season only** (competition wording). PRE/POST rows exist in player_play: exclude PRE; POST only as robustness.
+- Defender pressure has no flag: pressure generated = `time_to_pressure` non-null. Run play = `pass_result == ""`. `NO_ASSIGNMENT` = rusher (not a coverage snap). DL `blitzing` behaves as a rushing flag.
+- `separation_at_pass_forward` exists for all routes on thrown passes (not sacks or scrambles) and is reproduced exactly from tracking. There is no DB coverage-performance outcome.
+- Context adjustment removes much apparent player signal (WR short-route separation reliability 0.75 -> 0.22). Always report adjusted reliability.
+- In DL, forty / 10-yd split / peak speed / weight are one dimension (|rho| 0.80-0.97): no incremental-over-40 test is possible.
 - Unit of inference is the **player** (n ≈ 500; 63–77 per position with ≥100 REG plays). Split by player, never by frame or play.
 
 ## Simulation rules (Phase 1.6)
