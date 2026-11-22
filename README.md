@@ -3,9 +3,7 @@
 Research codebase for the [NFL Big Data Bowl 2027](https://www.kaggle.com/competitions/nfl-big-data-bowl-2027)
 Kaggle competition (Featured, deadline 2027-01-06).
 
-Our goal is a PhD-level contribution that meets three standards — an advanced technical
-contribution, a genuinely novel discovery, and a potentially new algorithm that improves on
-existing approaches. See [`CLAUDE.md`](CLAUDE.md) for the full research charter.
+Our goal is a rigorous, reproducible, PhD-level analysis of how NFL Combine athletic measures relate to regular-season movement and performance. The confirmatory study is complete. A final literature audit found no defensible new algorithmic contribution from the available data; see [`research_notes/phase8c_novelty_audit.md`](research_notes/phase8c_novelty_audit.md). Any additional estimator benchmark is a separate empirical study and requires its own preregistration.
 
 ## Data
 
@@ -85,6 +83,7 @@ pip install -r requirements.txt
 | 5b. H1-WR registered robustness + negative control | ✅ Done — conclusion stable |
 | 5c. H2 (secondary, estimation-focused after D4) | ✅ Done — no incremental information detected; notebook 09 |
 | 5d. Secondary Holm family (H1-DB, H1-DL a/b, H5b), H5(a)/(c), H1-global, TE descriptives | ✅ Done — notebook 10, `research_notes/secondary_family_results.md` |
+| 8. Literature novelty audit | ✅ Done — no new algorithm justified; see `research_notes/phase8c_novelty_audit.md` |
 
 ## Research summary (current)
 
@@ -134,8 +133,8 @@ The consolidated final summary, with claims, non-claims, limitations and opportu
 - **H1-DL(a):** a pass-rush-vs-run difference of ≥ 0.15 is not supported.
 - **Estimation only:** H5(a), the OL negative control (Δ_OL 0.08 [−0.46, 0.64]), H5(c) and the demand meta-regression are uninformative.
 
-| 3. Modelling & novel algorithm | — |
-| 4. Write-up & submission | — |
+| 6. Additional empirical estimator benchmark (optional; separate preregistration required) | Not approved |
+| 7. Write-up & submission | Next — consolidate the completed confirmatory study |
 
 ## Security
 
