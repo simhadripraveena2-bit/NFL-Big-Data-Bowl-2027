@@ -1,4 +1,53 @@
-# Phase 8 recommendation (revised in Phase 8B)
+# Phase 8 recommendation (revised in Phase 8B; final decision in Phase 8C)
+
+## Phase 8C final decision: **B. An empirical contribution is defensible, but no new algorithm is justified.**
+
+**Basis:** `phase8c_novelty_audit.md`.
+
+**Read for the audit:**
+- Spearing et al. 2021 (F, arXiv version);
+- the step-and-turn implementation (F-code);
+- RACE, Lee 2026 (P);
+- Postma et al. 2022 (A);
+- MLB Statcast Sprint Speed (S).
+
+**Inaccessible:** Greene 2005 and Koop et al. 1997 (closed access, K only), and Hall & Simar 2002 (repository copy restricted; A).
+
+**Answers in brief:**
+1. **Player-specific capacity conditional on opportunity already exists in pieces**, not as one validated estimator:
+   - TTA gives population attainability conditional on distance, bearing and speed (F);
+   - mono-exponential models give player attainable speed as a function of distance (A/K);
+   - Statcast filters for full-effort "competitive runs" (S);
+   - RACE combines an envelope with athlete hierarchy (P);
+   - step-and-turn has player random effects given context (F).
+2. **Representation of opportunity:**
+   - Only TTA and the sprint-kinematic models represent distance and time explicitly.
+   - Step-and-turn uses only the lagged 0.3-s step, the lagged turn, and the defender and teammate configuration. Its code subsamples to 0.3-s steps and bounds predictions by the sample's largest step.
+   - The poster and Spearing have none at the play level.
+3. **Direct application to our data:**
+   - Possible: order statistics, per-player QR, mono-exponential fits, Statcast-style filters, RE-SFA, RACE-style models, TTA retrained on own kinematics.
+   - **Not** step-and-turn as published: it needs all 22 players, and we have only the cohort player.
+4. **Combine as independent validation:** absent from all the closest works. But in-situ profiling studies already validate against sprint tests, so this is a **data advantage**, not a methodological novelty.
+5. **No technically defensible algorithmic contribution.**
+   - The opportunity-conditioned frontier is a specification inside existing classes.
+   - Its central separation of opportunity from effort is not identifiable here. Own-trajectory distance is endogenous to effort, exogenous proxies are coarse, opponents are absent, and the noisy boundary needs a known error law.
+6. **Held-out evaluation:** feasible (player-grouped and season-forward, with strong baselines), but **power-limited**. Within position n ≈ 60–77, and the minimum detectable Δρ is about 0.30.
+
+**Consequences:**
+- The algorithmic research track should be **closed** under CLAUDE.md standard 3. On that standard alone, the answer is C.
+- The only defensible continuation is the **G1′ empirical benchmark**:
+  - exposure and opportunity drift of game speed estimators;
+  - their agreement with combine peak speed on held-out players;
+  - interval calibration.
+  - It would be presented without a novelty claim, and only after a separate pre-registration.
+
+**Options for the project lead:**
+1. **Approve G1′** as an empirical contribution (a new pre-registration first).
+2. **Close the algorithmic track** and submit the completed confirmatory study as is.
+
+No further literature step is recommended. The remaining inaccessible works are classical, and the decision does not depend on their unread details.
+
+---
 
 **Status:** recommendation only.
 - **No implementation, training or modelling has been started.**

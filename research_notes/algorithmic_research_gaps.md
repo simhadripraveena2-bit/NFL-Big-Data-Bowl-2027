@@ -6,6 +6,50 @@
 
 **Caveat on every candidate.** "Insufficient existing methods" means *insufficient among the methods we could verify*. **No candidate is claimed to be novel.**
 
+## Phase 8C verdict (final novelty audit; supersedes the Phase 8B "possible algorithmic element" below)
+
+**Source:** `phase8c_novelty_audit.md`.
+
+**Read in full:**
+- Spearing et al. 2021 (arXiv version);
+- the step-and-turn code (all 12 R scripts);
+- the main sections of the RACE preprint (Lee 2026).
+
+**Inaccessible:** Greene 2005, Koop et al. 1997 and Hall & Simar 2002 (closed or restricted). These remain at K or A level.
+
+**Candidate tested:** the opportunity-conditioned frontier. Each play's peak speed is bounded by a player-specific kinematic attainable speed, given the play's available acceleration distance, with a one-sided effort deficit and hierarchical player effects.
+
+**Result: rejected as an algorithmic contribution.**
+1. **Components exist:**
+   - the mono-exponential sprint frontier (A/K);
+   - random-parameter / Bayesian SFA (K);
+   - deficit determinants (K);
+   - noisy-boundary estimation (A);
+   - RACE-style envelope + athlete hierarchy for speed capacity (P, 2026);
+   - opportunity-conditioned population attainability (TTA, F);
+   - rule-based opportunity filtering for player sprint capacity (MLB Statcast "competitive runs", S).
+2. **Identification fails in our data:**
+   - Available distance measured from the player's own trajectory is endogenous to effort.
+   - Exogenous opportunity proxies are coarse (route class, time to throw).
+   - Opponent-imposed turning or direction constraints cannot be measured: game tracking holds only the cohort player.
+   - The boundary is not identifiable without a known error law (Hall & Simar, A).
+3. **The external anchor is a data advantage, not a method.** In-situ profiling studies already validate against sprint tests (A/S).
+
+**Final status of each candidate:**
+- **G1** (algorithm): rejected (Phase 8B), confirmed.
+- **Opportunity-conditioned G1** (algorithm): rejected (Phase 8C).
+- **G1′** (empirical benchmark): defensible, not an algorithm.
+- **G2:** no algorithmic gap established.
+- **G3:** not reviewed; weakly identifiable.
+- **G4:** incremental.
+
+**Decision B:** an empirical contribution is defensible; no new algorithm is justified. Under CLAUDE.md standard 3 alone, the algorithmic track's answer is C.
+
+**G1′ update from Phase 8C** (extending the G1′ section below):
+- Add a **Statcast-style rule-filtered top-k** baseline (e.g. deep routes or long straight-line segments only) and a **RACE-style envelope + hierarchy** baseline.
+- Use **step-and-turn only in a reduced form** (own-kinematics covariates). The published model needs all 22 players.
+- **Power warning:** within position n ≈ 60–77, and the minimum detectable Δρ is about 0.30 (Phase 3.5). Small differences between estimators will not be detectable.
+
 ## Phase 8B verdict (full-text evidence; supersedes the G1 "possible contribution" below)
 
 - **The three closest works were read in full** (TTA preprint plus code; effort poster; step-and-turn preprint with appendices).
@@ -115,7 +159,7 @@ The estimators come from the families verified above: M1 max / top-k / 99th perc
 - Exposure is not randomly assigned: players with more plays differ (G3). Subsampling a player's own plays tests estimator drift (Q1), but not selection.
 - The result may be negative: no estimator beats the simple maximum. That would be a valid finding.
 
-**Possible algorithmic element: a candidate only, not claimed.** A per-play *attainable speed* bound derived from the play's own straight-line run-up (distance and time available), used to separate "no opportunity" plays from "sub-maximal on an opportunity" plays.
+**Possible algorithmic element (Phase 8B; REJECTED in Phase 8C, see the verdict at the top).** A per-play *attainable speed* bound derived from the play's own straight-line run-up (distance and time available), used to separate "no opportunity" plays from "sub-maximal on an opportunity" plays.
 - On current evidence this is a **specification choice within existing classes**: a deficit determinant (Battese–Coelli), or a censoring indicator.
 - It would count as a contribution only if a full-text check of the priority-2 works (§8 of the review) finds no equivalent **and** it measurably improves Q1–Q3 over M4b/M10 on identical splits. **Neither condition is met now.**
 
@@ -195,7 +239,8 @@ The estimators come from the families verified above: M1 max / top-k / 99th perc
 | | G1 (algorithm) | G1′ (empirical) | G2 | G3 | G4 |
 |---|---|---|---|---|---|
 | status after Phase 8B | **rejected as an algorithmic contribution**: every component is existing method | **open** at F level for the closest works; empirical, not algorithmic | novelty downgraded; mostly a combination of existing pieces | unchanged (selection-model literature not reviewed) | unchanged; strong prior work |
-| new algorithm? | no | no (a candidate element, unverified) | not established | possibly (a selection model), weakly identifiable | incremental at most |
+| status after Phase 8C | rejected, confirmed; the opportunity-conditioned variant is also rejected | **defensible empirical benchmark** (decision B) | unchanged | unchanged | unchanged |
+| new algorithm? | no | no (the candidate element was rejected in Phase 8C) | not established | possibly (a selection model), weakly identifiable | incremental at most |
 
 The Phase 8 summary table is kept below for the record.
 
