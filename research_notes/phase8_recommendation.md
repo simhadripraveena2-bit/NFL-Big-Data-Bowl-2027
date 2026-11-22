@@ -1,83 +1,85 @@
-# Phase 8 recommendation
+# Phase 8 recommendation (revised in Phase 8B)
 
-**Status:** recommendation only. **No implementation, training or modelling has been started.** The completed empirical study and its preregistration are unchanged.
+**Status:** recommendation only.
+- **No implementation, training or modelling has been started.**
+- The completed empirical study, its preregistration and the frozen analysis code are unchanged.
 
-## 1. Evidence base, and its main limitation
+## 1. Evidence base
 
-- The literature review (`related_work_full_text_review.md`) could **not** read any paper in full in this session. The full-text hosts were unreachable from the session's page fetcher, even after the project lead approved adding them to the environment.
-- Evidence is therefore **abstract-level** (Phase 1.5) or **search-level** (Phase 8).
-- Consequences:
-  - The ranking below is provisional.
-  - **No novelty claim is made.**
-  - The recommendation is conditional on a full-text check of the named closest works.
+**Phase 8B read the three closest works in full** (`related_work_full_text_review.md` §2.1, §2.2, §3.5):
 
-## 2. Scoring (1 = weak, 5 = strong)
+| work | type | what was read | inaccessible |
+|---|---|---|---|
+| Gutiérrez-Pérez & Agudo 2026, TTA quantile regression | arXiv preprint (claimed ACCV 2026 acceptance, unverified) | full main text; code repository (config, loss, model, training, dataset building) | supplement §A.1–A.4 |
+| Shteynberg, Snavely & Solorzano 2025, effort in NFL RBs | undergraduate summer research poster (CMU SURE); not peer-reviewed | the complete poster | written report (host unreachable) |
+| Nguyen & Yurko 2026, NFL step-and-turn | arXiv preprint | complete paper, Appendices A–F | code repository (not inspected) |
 
-| criterion | G1 exposure-aware capacity | G2 acceleration / braking / turning capacity | G3 capacity vs deployment | G4 crossed bootstrap |
-|---|---|---|---|---|
-| technical novelty (provisional) | 3 | 3 | 3 | 2 |
-| scientific significance | 4 | 4 | 4 | 3 |
-| feasibility | 4 | 2 | 2 | 5 |
-| data availability (ability to *validate*) | **5** | 2 | 1 | 4 |
-| strength of available baselines (higher = clearer benchmark) | 4 | 3 | 2 | 4 |
-| potential for measurable improvement | 4 | 3 | 2 | 3 |
-| **total (/30)** | **24** | 17 | 14 | 21 |
+Phase 8B also checked DOIs and abstracts of frontier and extreme-value prior art: Hall & Simar 2002 and Einmahl & Magnus 2008 (A); Spearing et al. 2021 (A); Greene 2005, Koop et al. 1997, Battese & Coelli 1995 and Kneip et al. 2015 (S/K).
 
-**Notes on the scores:**
-- **Novelty for G1 is scored only 3**, because two 2025–2026 works are close: an NFL quantile A–S effort report, and a quantile motion-feasibility model. Neither could be read.
-- **G4 scores high on feasibility, but low on novelty**, because the pigeonhole and Owen–Eckles bootstraps exist.
-- **G3 is scientifically important but weakly identifiable** with these data.
+## 2. Findings against G1
 
-## 3. Recommended direction: G1
+**Does existing work already solve G1? Not as a problem; yes as a method.**
 
-**Exposure-aware estimation of latent athlete speed capacity from sub-maximal, context-dependent game tracking, validated against combine tracking.**
+- **Problem not solved (F level).**
+  - None of the three works estimates a per-athlete latent speed capacity that accounts for exposure, with pooling, per-athlete uncertainty and external validation.
+  - TTA uses a 99th-percentile per-player v_max as a known input. Its canonical code computes it within the test match, which the config calls "look-ahead leakage".
+  - The poster fits independent per-player 0.95 quantile curves, to measure effort.
+  - Step-and-turn pools players for *mean* step length.
+- **Method largely exists:**
 
-**Why G1:**
-1. **It targets a problem our own study exposed.**
-   - Observed game maxima depend on exposure and role (Phase 2).
-   - Match peak speed is known to sit below test maxima, and to depend on situation (literature, search level).
-   - Yet "game top speed" is used as an athlete trait in applied models (e.g. player-specific top speeds in pitch control).
-2. **The competition data has an unusual asset: an external near-capacity measurement for the same athletes.**
-   - Combine tracked 40 peak speed, within-position reliability 0.94–0.99.
-   - It allows held-out, exposure-stratified validation that most tracking studies cannot do.
-3. **Clear, strong baselines exist:** observed max, top-k mean, high quantile, in-situ A–S S0, per-athlete quantile curves, stochastic frontier, and hierarchical mean models. Improvement can be measured on identical splits.
-4. **It reuses validated infrastructure:** the single join, real-design simulation skeletons, player-grouped cross-validation and season-forward splits.
+  | G1 ingredient | existing work | evidence |
+  |---|---|---|
+  | conditional quantile regression | TTA; poster QR / QGAM | F |
+  | player random effects and hierarchical shrinkage with posterior uncertainty | step-and-turn; Bayesian / true-RE SFA | F; S/K |
+  | context-dependent one-sided deficits | Battese–Coelli | S/K |
+  | exposure-aware extreme-value estimation (occurrence rate, covariates, endpoints) | Spearing et al. 2021; Einmahl & Magnus 2008 | A |
+  | boundary under observation noise | Hall & Simar 2002 | A |
 
-**What success would mean (to be pre-specified before any model is fitted):**
-- **(a) Exposure invariance.** Estimates for the same player change less across subsampled exposure levels than the baselines' do.
-- **(b) External validity.** Higher within-position rank agreement with combine peak speed, and calibrated interval coverage, on held-out players.
-- **(c) Unseen athletes.** Calibrated predictions for players with few plays.
-- **(d) Simulation recovery.** Of known capacities under realistic opportunity distributions.
+**Decision:**
+- **G1 as an algorithmic contribution is rejected.** Assembling these components is not an original algorithm.
+- **G1 is reformulated as G1′**, an empirical identification and validation study:
+  - does game-derived top speed drift with exposure?
+  - which existing estimator best recovers an independently measured capacity (combine tracked peak speed), with calibrated intervals, for held-out players?
 
-**Known risks, stated in advance:**
-- **Construct gap.** Combine straight-line peak speed is not identical to game capacity (equipment, flying vs standing start, context). Validation therefore targets ranking, calibration and exposure invariance, not levels.
-- **Prior work.** The closest works may already model exposure. If so, the direction must be narrowed or dropped. **The full-text check comes first.**
-- **Selection.** Players with more opportunities differ systematically, which ties into G3. The design must separate exposure (a count) from selection (who gets it).
+## 3. Re-scoring (1 = weak, 5 = strong)
 
-## 4. Proposed next steps (only after approval)
+| criterion | G1 (algorithm) | **G1′ (empirical)** | G2 | G3 | G4 |
+|---|---|---|---|---|---|
+| technical novelty | 1 (components exist) | 2 (no new method; an untested question) | 2 (was 3) | 3 | 2 |
+| scientific significance | 4 | 4 | 4 | 4 | 3 |
+| feasibility | 4 | 4 | 2 | 2 | 5 |
+| data availability (ability to validate) | 5 | 5 | 2 | 1 | 4 |
+| strength of baselines (higher = clearer benchmark) | 4 | 5 (concrete: M1, TTA-style v_max, M3b, M7, M4b, M10) | 3 | 2 | 4 |
+| potential for measurable improvement | 4 → n/a | 3 (a negative result is possible) | 3 | 2 | 3 |
+| **total (/30)** | rejected | **23** | 16 | 14 | 21 |
 
-1. **Restore full-text access.** Start a new session on the updated environment (arxiv.org, PubMed Central, Europe PMC and Springer are now allowed), or supply the PDFs.
-2. **Full-text review**, recording all Task 1 fields, of:
-   - Gutiérrez-Pérez & Agudo 2026;
-   - Shteynberg et al. 2025;
-   - Nguyen & Yurko 2026 and 2025;
-   - Morin 2021 and Miguens 2024;
-   - SFA (Aigner 1977, plus panel and hierarchical SFA);
-   - order-α / extreme-value frontier work (Daouia et al.);
-   - Brefeld 2019 and Narizuka 2023.
-   Then update the evidence levels and **re-score G1–G4**.
-3. **Only if G1 survives:** write a methods pre-registration covering:
-   - the estimand;
-   - the baselines;
-   - the exposure-subsampling protocol;
-   - the held-out and season-forward splits;
-   - the metrics and significance tests;
-   - the simulation design;
-   - the algorithm in pseudocode, with its complexity.
-4. **No modelling before that pre-registration is approved.**
+**Changes since Phase 8:**
+- G1 (24) is split into G1 (rejected) and G1′ (23).
+- G2 drops from 17 to 16: per-player A–D quantile curves exist (F), and so does noise-aware boundary estimation (A).
+- G3 and G4 are unchanged: no new evidence bears on them.
+
+## 4. Recommendation
+
+**No defensible algorithmic gap is established by the available evidence.** That holds for G1, G2 and G4. G3 might yield a selection-model method, but it is weakly identifiable in these data and its literature has not been reviewed. A G1-type algorithm would be a combination of existing methods, which the project lead's rules exclude.
+
+**The most defensible remaining direction is G1′.** It is empirical and does not satisfy CLAUDE.md standard 3 (a new algorithm) on its own.
+- **Why G1′:** the reviewed works use game-derived player speed traits (TTA's v_max) or player effects (step-and-turn) without testing them against an independent measurement. The competition data uniquely has one for the same athletes.
+- **What it would deliver:** a pre-registered benchmark of existing estimators (Q1 exposure drift, Q2 within-position agreement with combine peak speed on held-out and season-forward players, Q3 interval calibration), with identical splits and paired tests.
+- **Known risks:**
+  - construct gap: combine ≠ game capacity, so the comparison is on ranks and calibration, not levels;
+  - selection into exposure (G3);
+  - a negative result is likely and acceptable.
+
+**Options for the project lead (no default is assumed):**
+1. Approve G1′ as an empirical contribution and accept that the algorithmic standard is not met by this direction.
+2. Require one more literature step first. Read in full Spearing et al. 2021, Greene 2005 / Koop et al. 1997, Hall & Simar 2002 and the step-and-turn code. Only then decide whether the "attainable-speed bound per play" element (`algorithmic_research_gaps.md`, G1′) could be a genuine method contribution.
+3. Close the algorithmic track: report that no defensible algorithmic gap was found, and submit the completed empirical study as is.
 
 ## 5. Explicitly not claimed
 
-- That G1 (or any candidate) is novel.
+- That G1, G1′ or any candidate is novel.
+- That combining existing methods is an original contribution.
 - That combine peak speed *is* game capacity.
-- That any of the four candidates has been, or can be, validated before the steps above.
+- That the backup-RB pattern in the poster is an exposure artefact (it is consistent with one; untested).
+- That TTA's published numbers used the leaking v_max scope (not determined).
+- Anything about the inaccessible TTA supplement, the Shteynberg report, or the priority-2 full texts.

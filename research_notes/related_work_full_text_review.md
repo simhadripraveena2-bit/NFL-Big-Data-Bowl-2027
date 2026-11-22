@@ -1,20 +1,27 @@
 # Phase 8: related-work review (latent movement capacity from noisy, context-dependent tracking)
 
-**Status: the full-text review requested in Task 1 could NOT be completed.**
+**Status (Phase 8B, 2026-11-22): the three priority-1 works have now been read in full.** Access was recovered with a shell download through the session proxy (the page fetcher still fails DNS):
+- §2.1 Gutiérrez-Pérez & Agudo 2026: complete arXiv HTML main text, plus the authors' code repository.
+- §2.2 Shteynberg et al. 2025: the complete one-page poster.
+- §3.5 Nguyen & Yurko 2026: complete arXiv HTML, including Appendices A–F.
 
-In this session, no full text, and no publisher abstract page, could be retrieved directly. Every fetch to the hosts that serve the papers failed:
-- arxiv.org, export.arxiv.org;
-- www.ncbi.nlm.nih.gov, pmc.ncbi.nlm.nih.gov, www.ebi.ac.uk;
-- link.springer.com, doi.org;
-- repository mirrors.
+**Still inaccessible, or not read:**
+- the TTA supplement (§A.1–A.4), which is not in the arXiv HTML;
+- the Shteynberg written report (eshteynberg.github.io), whose host is not reachable;
+- the step-and-turn code repository (not requested);
+- every other entry, which stays at its Phase 8 evidence level.
 
-All failures were DNS errors. The project lead approved adding these hosts to the environment (2026-11-22). The session's page fetcher still failed after the change, and a shell download was refused by the session's permission check. A new session on the updated environment may resolve this. **Until the papers are read in full, every statement below is provisional.**
+Phase 8B also verified DOIs and, where OpenAlex had them, read the abstracts of the extreme-value and panel-frontier works that bear on G1 (§2.3–2.5).
+
+The downloaded sources were treated as untrusted data: read only, never executed, and not committed.
+
+**Phase 8 header, kept for the record:** in Phase 8 no full text could be retrieved, because of DNS failures for arxiv.org, NCBI/PMC, EBI, Springer and doi.org. Entries not upgraded below remain provisional.
 
 ## 0. Evidence levels (used in every entry)
 
 | code | meaning |
 |---|---|
-| **F** | full text read: **none in this phase** |
+| **F** | full text read (Phase 8B): §2.1 main text and code (supplement inaccessible); §2.2 the complete poster (the written report inaccessible); §3.5 the complete paper with appendices |
 | **A** | abstract read in Phase 1.5 (`literature_review.md`; abstract obtained via PubMed / publisher; DOI verified there) |
 | **S** | search-level only (Phase 8): existence, authors, venue, identifier and a summary returned by a web-search engine. This is *secondary*: neither the paper's own abstract page nor its text was read |
 | **K** | an established method whose generic formulation is standard textbook knowledge. The formulation shown is the standard form, **not checked against the paper** |
@@ -112,33 +119,91 @@ All failures were DNS errors. The project lead approved adding these hosts to th
 
 ### 2.1 Gutiérrez-Pérez & Agudo (2026), motion feasibility via quantile regression
 
-- **Citation:** *Learning Human Sports Motion Feasibility via Quantile Regression on Tracking Data.* arXiv 2610.36183.
-- **Evidence:** S ([arXiv](https://arxiv.org/abs/2610.36183)); code reported at github.com/mguti97/TTA-Quantile.
-- **Problem (S):** time-to-arrival (TTA), the shortest plausible time for a player to reach a location given the current kinematic state.
-- **Data (S):**
-  - PFF FC World Cup 2022 (64 matches, 30 fps);
-  - plus NBA SportVU 2015–16 and one NFL Big Data Bowl 2019 game.
-- **Formulation (S + K):**
-  - Conditional quantile regression of locomotion time at a very low quantile, τ = 0.01 (a "lower envelope"), minimising the pinball loss ρ_τ(u) = u(τ − 1{u < 0}).
-  - A lightweight MLP.
-- **Baselines (S):** six player-motion models from the literature, plus a learned reachable-hull baseline. The MLP reportedly beats all physics baselines; cross-sport transfer is asymmetric.
-- **Assumptions / limitations:** not verified. The search summary notes that tracking errors cluster in the fast tail, exactly where the model is fitted.
-- **Unsolved (our reading; must be checked against the full text):**
-  - The estimand appears to be a **population** (feature-conditional) feasibility envelope, not an athlete-specific latent capacity.
-  - Exposure, effort and per-athlete uncertainty are not described in the material seen.
-- **This is the closest recent work. It must be read in full before any novelty claim.**
+- **Citation:** Marc Gutiérrez-Pérez, Antonio Agudo (Institut de Robòtica i Informàtica Industrial, CSIC-UPC). *Learning Human Sports Motion Feasibility via Quantile Regression on Tracking Data.* arXiv 2610.36183v1 (26 Oct 2026, cs.AI). [arXiv HTML](https://arxiv.org/html/2610.36183); code [github.com/mguti97/TTA-Quantile](https://github.com/mguti97/TTA-Quantile).
+- **Publication status:** **preprint.** The repository README states ACCV 2026 acceptance. This was not verified (no proceedings record was checked), so the work is treated as a non-peer-reviewed preprint.
+- **Evidence: F** for the main text (§1–5, tables, figures, references) and **code inspected** (see below).
+  - **Inaccessible:** Supplementary §A.1 (smoothing windows and kinematic thresholds), §A.2 (closed forms of the six physics baselines), §A.3 and §A.4 (structural-audit protocol). They are referenced but not included in the arXiv HTML. Statements relying on them are marked.
+- **Problem:** time-to-arrival (TTA), the minimum plausible time for a player in kinematic state k = (p, v, a) to reach a target x. It is the input that pitch-control and space models need.
+- **Estimand (paper, Eq. 1):**
+  - τ(g) = Q_0.01(Δt | g(k, x)), the 1st percentile of observed arrival time given the state–target geometry g.
+  - In the authors' words, "the conditional lower envelope of arrival times, not a per-observation minimum".
+  - Intent, fatigue, tactics and obstacles "all act in the conservative direction", so they are discarded by the low quantile, not modelled.
+  - Reachable set: R(Δt) = {x : τ(x) ≤ Δt}.
+- **Features:** six heading-frame inputs: d/120, cos θ, sin θ, v/12, a_x/10, a_y/10.
+- **Data:**
+  - PFF FC World Cup 2022: 64 matches, 30 fps, split by match 45/10/9, about 154M self-supervised samples (five horizons per state, uniform in [0.1, 8] s).
+  - NBA SportVU 2015–16: 631 games, 25 fps.
+  - NFL BDB 2019: a **single game**, 10 fps, 729,510 samples, split **by player** (within-game).
+- **Preprocessing:**
+  - Savitzky–Golay smoothing, then finite differences.
+  - Exclusion of frames that break hard kinematic bounds (thresholds are in the inaccessible §A.1).
+  - Code: a SUVAT label filter (8 m/s², 9 m/s) removes about 0.3 % of samples.
+  - The authors state that identity swaps and position jumps "sit precisely at the fast tail from which our τ = 0.01 objective learns".
+- **Model and algorithm:**
+  - An MLP 6→64→64→1 with ReLU and a Softplus output.
+  - Loss: pinball at τ = 0.01, plus a differentiable area-aware term (λ = 0.01, β = 0.25 s, horizons {3, 5} s).
+  - Adam (code: LR 1e-3, batch 4096, ≤ 200 epochs, patience 12, seed 42).
+- **Personalisation ("player-profile MLP", §3.6):**
+  - A 7th input: the player's v_max = **99th percentile of that player's cleaned speeds pooled over the 45 training matches**.
+  - This is a plug-in order statistic. It has no shrinkage, no exposure adjustment and no uncertainty.
+  - Unseen players get the median (code).
+- **Baselines:**
+  - Six literature motion models, re-expressed as TTA predictors and refitted with a reachable-area objective at a matched 0.99 correctness gate.
+  - The Anzer–Bauer learned reachable hull.
+  - A control giving the physics models the same per-player v_max (two-segment + v_max is the "personalised baseline").
+- **Metrics:** MAE, RMSE and pinball at τ = 0.01 on held-out matches; reachable area at matched coverage; structural audit (connectedness, star-shapedness, monotonicity).
+- **Results (World Cup test split):**
+  - MLP MAE 2.596 s; profile MLP 2.577 s.
+  - Best physics model 2.883 s; two-segment + v_max 2.900 s; hulls 3.065 s.
+  - Profile gain 0.025 s, 95 % CI [0.019, 0.030], from a paired cluster bootstrap over test matches.
+  - Personalised physics still trails the profile MLP by 0.30 s.
+  - NFL in-domain MAE 1.297 vs 1.608 for two-segment. Cross-sport transfer is asymmetric.
+  - Audit: 100 % connected and star-shaped; 1.4 % monotonicity violations.
+- **Ablations:** quantile level and area term; profile vs non-profile; physics with vs without v_max.
+- **Stated limitations / future work:**
+  - "Natural next steps include richer conditioning for player personalization".
+  - The code notes that conditional coverage falls below target in sparse far bands when the area term is on.
+- **Code inspection (repository cloned, read only, not executed):**
+  - Objective: `PINBALL_TAU = 0.01`, `PLAYER_VMAX_PCT = 99.0`.
+  - Splits: `SPLIT_MODE` ∈ {match, player, block}.
+  - **The canonical `VMAX_SCOPE = "match"` computes the per-player percentile within each match, test matches included.** The config itself calls this "look-ahead leakage". The leakage-free `"train_split"` scope is the one the paper describes. *Which scope produced the published numbers was not determined from the code.*
+  - A comment names "cameo players whose 99th percentile rests on a handful of frames", i.e. the authors note the exposure problem informally without modelling it.
+  - An a_max profile was removed for "no between-player spread".
+  - Stale documentation: the README says the 95th percentile, and the `loss.py` docstring says τ = 0.05.
+- **Relation to G1 (our reading, F-level):**
+  - **Solves:** a population, feature-conditional *feasibility envelope* by conditional quantile regression, with strong physics baselines and held-out evaluation.
+  - **Does not address:**
+    - a latent per-athlete capacity as the estimand: per-player v_max is an *input*, taken as known;
+    - exposure or opportunity: the 99th percentile is exposure-naive, and "cameo" players are acknowledged only in a code comment;
+    - hierarchical shrinkage, or per-athlete uncertainty;
+    - separating capacity from effort or context: these are absorbed by the low quantile;
+    - validation of any capacity quantity against an independent measurement.
 
-### 2.2 Shteynberg, Snavely & Solorzano (2025), effort in NFL running backs (student report, not peer-reviewed)
+### 2.2 Shteynberg, Snavely & Solorzano (2025), effort in NFL running backs (student poster, not peer-reviewed)
 
-- **Citation:** *Tracking the Intangible: Quantifying Effort in NFL Running Backs.* CMU SURE program report and poster.
-- **Evidence:** S ([report](https://eshteynberg.github.io/Football-Effort/report); [poster](https://www.stat.cmu.edu/cmsac/sure/2025/showcase/football_effort/poster.pdf)). The host was unreachable for reading.
-- **Problem (S):** estimate each running back's A–S limit from tracking, and measure how often the player operates near it as an effort proxy.
-- **Data (S):** Big Data Bowl 2025, 2022 weeks 1–9, 10 Hz; 69 running backs with ≥ 20 carries.
-- **Formulation (S):**
-  - Quadratic quantile regressions for the 0.95 quantiles of acceleration and deceleration as functions of speed;
-  - a quantile GAM.
-- **Stated motivation (S):** the soccer in-situ method gives no credit for low-speed plays, penalises athletic players, and does not separate acceleration from deceleration.
-- **Unsolved (our reading):** this is the closest *football* precedent for separating capacity from realised effort. Opportunity and exposure, context and uncertainty are not verified. It is not peer-reviewed.
+- **Citation:** Emily Shteynberg (NYU), Luke Snavely (Robert Morris), Sheryl Solorzano (Amherst). *Tracking the Intangible: Quantifying Effort in NFL Running Backs.* CMU Statistics & Data Science SURE 2025 showcase poster. [poster pdf](https://www.stat.cmu.edu/cmsac/sure/2025/showcase/football_effort/poster.pdf).
+- **Publication status:** **undergraduate summer research poster.** Not peer-reviewed, and not a paper.
+- **Evidence: F for the poster** (one page, read in full).
+  - **Inaccessible:** the written report at eshteynberg.github.io/Football-Effort/report, whose host is not reachable. Any details only in the report (code, exact QGAM settings, uncertainty) are unknown.
+- **Problem:** an objective *effort* measure for running backs, defined as how often a player comes close to, or exceeds, **their own** A–S frontier.
+- **Data:** BDB 2025, 2022 weeks 1–9, 136 games, 10 fps. Running plays with an RB ball carrier; RBs with ≥ 20 runs (69 RBs).
+- **Formulation:**
+  - The starting point is Morin 2021 (in-situ A–S, with S0/A0). The poster lists its drawbacks: no credit for low-speed points; unrealistic theoretical max speeds; "players are penalized for being athletic" (high-A0 players get a low % of effortful points); no separation of acceleration and deceleration.
+  - **Metric 1:** per-player quadratic quantile regressions at τ = 0.95 for acceleration and for deceleration as functions of speed.
+    - d_i = vertical distance from each point to its curve; d_i = 0 for points beyond the curve.
+    - Ψ_i = 1/(1 + d_i) for acceleration, and ½ · 1/(1 + d_i) for deceleration (deceleration "deemed less effortful", citing Hader 2016).
+    - Effort = mean of Ψ over frames.
+  - **Metric 2:** the same with QGAMs (adaptive splines) at 0.95.
+- **Baselines / validation:** the two metrics against each other (positively correlated). Correlation with play outcomes: QGAM effort vs YAC −0.081, EPA −0.103, rushing yards −0.079. Mean speed correlates 0.38–0.52.
+- **Results:**
+  - "Back-up RBs consistently lead in both effort metrics." The authors' explanations: more out of limited opportunities, less fatigue, or starters not needing to exert as much.
+  - Effort metrics do not correlate with outcomes.
+- **Stated limitations:** the model "does not fully account for in-play context"; individualised A–S curves "hold players to different standards → limits cross-player comparison".
+- **Uncertainty:** none reported.
+- **Relation to G1 (our reading, F-level for the poster):**
+  - Capacity is a **per-player, independently fitted 0.95 quantile curve**: no pooling, no exposure model, no uncertainty, no external validation.
+  - The backup-RB result is exactly the pattern an exposure artefact would produce. Players with fewer frames have quantile curves fitted to fewer points, so more points lie near or above them. The poster does not test this explanation, and we do not claim it is the cause.
+  - **It addresses a different estimand (effort), and leaves the capacity estimand unsolved.**
 
 ### 2.3 Stochastic frontier analysis (SFA)
 
@@ -148,7 +213,11 @@ All failures were DNS errors. The project lead approved adding these hosts to th
 - **Relevance (our reading):** capacity = frontier; effort or opportunity = u.
   - Classical SFA treats u as i.i.d. with a fixed distribution.
   - It has no hierarchical athlete-level frontier, no context-dependent u, and no exposure-driven order statistics.
-  - Panel SFA variants exist but were **not reviewed** here.
+- **Panel / random-effects / determinants extensions (Phase 8B; DOIs verified via Crossref; no abstract available through OpenAlex, so evidence S + K):**
+  - Battese & Coelli (1995), Empirical Economics 20:325, [10.1007/BF01205442](https://doi.org/10.1007/BF01205442). K: the mean of the one-sided u depends on covariates ("inefficiency determinants"), i.e. **a context-dependent deficit is standard**.
+  - Koop, Osiewalski & Steel (1997), J Econometrics 76:77, [10.1016/0304-4076(95)01783-6](https://doi.org/10.1016/0304-4076(95)01783-6). K: Bayesian frontier with individual effects, i.e. **posterior per-unit uncertainty with hierarchical priors is standard**.
+  - Greene (2005), J Econometrics 126:269, [10.1016/j.jeconom.2004.05.003](https://doi.org/10.1016/j.jeconom.2004.05.003). K: "true random effects" SFA, separating a unit-level heterogeneity term from inefficiency.
+- **Consequence for G1 (our reading):** a frontier with a per-athlete random level, a covariate-dependent one-sided deficit, and Bayesian per-athlete intervals is an **existing model class**. It does not by itself model an *exposure-dependent number of draws*.
 
 ### 2.4 Order-α (partial) quantile frontiers and extreme-value frontier estimation
 
@@ -165,6 +234,27 @@ All failures were DNS errors. The project lead approved adding these hosts to th
 - **Relevance (our reading):**
   - This is a robust statistical vocabulary for "capacity = upper boundary".
   - It is developed for production frontiers with i.i.d. units, not for per-athlete boundaries pooled hierarchically with an exposure-dependent number of draws.
+- **Boundary estimation with observation error (Phase 8B):**
+  - Hall & Simar (2002), JASA 97:523, [10.1198/016214502760047050](https://doi.org/10.1198/016214502760047050). **Evidence A** (abstract via OpenAlex).
+    - With additive error of variance σ², frontier estimates are biased at order σ. A simple method reduces this to O(σ²).
+    - The frontier "is generally not even identifiable unless the error distribution is known".
+  - Kneip, Simar & Van Keilegom (2015), J Econometrics 184:379, [10.1016/j.jeconom.2014.09.012](https://doi.org/10.1016/j.jeconom.2014.09.012). **Evidence S** (DOI verified; title only): frontier estimation with measurement error of unknown variance.
+  - **Consequence:** the noise-inflated-tail problem (spikes, identity swaps) in boundary estimation is a studied problem, with a known identifiability limit.
+
+### 2.5 Extreme-value theory for athlete performance (Phase 8B)
+
+- **Einmahl & Magnus (2008)**, *Records in athletics through extreme-value theory.* JASA 103:1382, [10.1198/016214508000000698](https://doi.org/10.1198/016214508000000698). **Evidence A.**
+  - Estimates the **ultimate (endpoint) performance** per event from all top performances, with nonparametric EVT, and derives limiting distributions.
+- **Spearing, Tawn, Irons, Paulden & Bennett (2021)**, *Ranking, and other properties, of elite swimmers using extreme value theory.* JRSS A 184:368, [10.1111/rssa.12628](https://doi.org/10.1111/rssa.12628) (correction 2025, [10.1093/jrsssa/qnae154](https://doi.org/10.1093/jrsssa/qnae154)). **Evidence A.**
+  - Best swim times are modelled "through their **rate of occurrence**", with a GPD for the best times.
+  - The GPD parameters vary with covariates (event, date, technology), and information is shared across events.
+  - It estimates the "ultimate possible time".
+- **Consequence for G1 (our reading, A level):**
+  - Covariate-dependent point-process / GPD models of the best performances, which explicitly model *how often* performances occur, together with endpoint estimation, are **established**.
+  - What we did not find (absence in search, not evidence of absence):
+    - an application to *per-athlete* endpoints from within-game tracking, with athlete-level random effects;
+    - validation against an independent test of the same athletes.
+  - A full-text check would be needed to see whether Spearing et al. include athlete-level effects. The abstract describes event-level covariates.
 
 ## 3. Context-dependent movement modelling
 
@@ -210,17 +300,36 @@ All failures were DNS errors. The project lead approved adding these hosts to th
 
 ### 3.5 Nguyen & Yurko (2026), Bayesian multilevel step-and-turn models
 
-- **Citation:** arXiv 2603.17866, *NFL step-and-turn: A generative framework for evaluating player movement in American football*.
-- **Evidence:** S ([arXiv](https://arxiv.org/abs/2603.17866v1); [project page](https://cmsac-research-lab.github.io/papers/nfl-step-turn/nfl-step-turn.html)).
-- **Formulation (S):**
-  - Frame-level multilevel models for step length and turn angle.
-  - Posterior predictive simulation of hypothetical ball-carrier steps.
-  - Evaluation of observed movement against simulated alternatives.
-  - Data: 2022 weeks 1–9.
-- **Relevance (our reading):**
-  - This is the closest NFL **hierarchical generative movement model**, with player-level random effects and context.
-  - Whether it models an upper capacity (a feasible-step boundary) or only typical steps is **not verified**.
-  - **It must be read in full before any novelty claim.**
+- **Citation:** Quang Nguyen, Ronald Yurko (Carnegie Mellon University). *NFL step-and-turn: A generative framework for evaluating player movement in American football.* arXiv 2603.17866. [arXiv HTML](https://arxiv.org/html/2603.17866); code stated at github.com/qntkhvn/nfl-step-turn (**not inspected**).
+- **Publication status:** **preprint** (arXiv). No journal version was identified.
+- **Evidence: F.** The complete HTML was read: §1–5, Appendices A–F, references. Figures were seen only through captions and surrounding text.
+- **Problem:** evaluate ball-carrier movement frame by frame, by comparing the observed next step with posterior-predictive hypothetical next steps, valued by an expected end-of-play yard line model.
+- **Data:** BDB 2025, 2022 weeks 1–9; 5,400 run plays, 136 games; ball-carrier sequences from handoff to tackle, out of bounds or touchdown; RBs with ≥ 70 rushes for the leaderboards.
+- **Formulation:**
+  - **Step length** s_ijt (distance between successive 10 Hz positions, i.e. speed × 0.1 s), scaled-arcsine transformed:
+    - s̃_ijt ~ N(μ, σ²), with μ = α + X β + u_j + v_k;
+    - u_j ~ N(0, τ_u²) is a ball-carrier random intercept, and v_k ~ N(0, τ_v²) a defensive-team random intercept;
+    - X contains ball-carrier and closest-defender features, player counts per direction, and the **lagged step length**.
+  - **Turn angle:** von Mises, with a tan-half link on the mean and log κ = γ0 + γ1 s_ijt + w_j (a player random effect on concentration).
+  - Fitting: Bayesian, with brms/Stan (NUTS; 4 chains × 5,000 iterations with 2,500 warm-up). Priors: half-t3 on the SDs, defaults elsewhere.
+- **Simulation and evaluation:**
+  - One-step-ahead posterior predictive draws (H = 100), with a *new* random effect for a generic player (Appendix F: the player's own effect).
+  - Other players are held fixed.
+  - Valued by a CatBoost multinomial end-of-play yard line model (grouped 5-fold CV by game, Appendix E).
+  - Metrics: δ̄ (yards vs the hypothetical), yards success rate, explosiveness (the frame-level outcome above the 95th percentile of hypotheticals).
+- **Validation:**
+  - Posterior predictive checks of the step-length distribution: arcsine vs Gamma vs log-normal (Appendix A).
+  - MCMC diagnostics (Appendix B); prior sensitivity, with rankings unchanged (Appendix C).
+  - Face validity of the leaderboards against scouting descriptions.
+  - **No held-out predictive validation of the movement models, and no external measurement.**
+- **Stated limitations:**
+  - One-step simulation only, with other players fixed: full forward simulation would need a tackle model and multi-agent movement, and fixing other players biases simulation.
+  - Nine weeks of data.
+- **Relation to G1 (our reading, F level):**
+  - **Solves, for NFL tracking:** player random effects with partial pooling and full posterior uncertainty for a speed-like quantity (step length), conditional on frame-level context and opponent.
+  - **What it estimates is the conditional *mean* (transformed) step length**, i.e. typical speed given context. It is not an upper boundary or capacity, and the paper does not claim one.
+  - u_j is a "long strides" trait, confounded with role and usage (e.g. the Jonathan Taylor vs McCaffrey discussion).
+  - No exposure model, no external validation. The Gaussian mean model is the natural "hierarchical mean" baseline for G1, now with a concrete NFL precedent.
 
 ## 4. Sports tracking trajectory analysis (NFL)
 
@@ -326,30 +435,34 @@ All failures were DNS errors. The project lead approved adding these hosts to th
 
 The entries are covered above: 3.4, 3.5, 5.2, 5.4. A Bayesian critical-velocity model ([SFU paper](https://www.sfu.ca/~tswartz/papers/crit_vel.pdf), S) shows priors combined with sparse field data for speed-duration models.
 
-**No work was found that fits a hierarchical (athlete-pooled) model of a *maximal-capacity boundary* in which:**
-- the observed in-game maxima are explicitly modelled as exposure-dependent;
-- capacity is validated against an independent standardised test for the same athletes.
+**Phase 8B revision.** Each ingredient of such a model is now verified as existing:
+- hierarchical athlete effects with posterior uncertainty on NFL speed-like movement: §3.5, F;
+- conditional low or high quantile envelopes: §2.1 and §2.2, F;
+- covariate-dependent one-sided deficits and random-effect frontiers: §2.3, S/K;
+- boundary estimation with observation error: §2.4, A;
+- rate-of-occurrence (exposure-aware) EVT for best performances, with covariates and endpoint estimation: §2.5, A.
 
-This is an **absence in our searches, not evidence of absence.** See §8.
+**No work was found that applies these jointly to per-athlete game-tracking speed capacity and validates the result against an independent standardised test of the same athletes.** This is an absence in our searches, not evidence of absence. Because the ingredients exist, assembling them is **not** treated as an algorithmic contribution (see `algorithmic_research_gaps.md`).
 
-## 8. What this review can and cannot support
+## 8. What this review can and cannot support (revised in Phase 8B)
 
 **It can support:**
-- The established approaches are identified (§§1–6), along with their standard formulations.
-- The three most relevant recent works are identified, all needing full-text reading:
-  - Gutiérrez-Pérez & Agudo 2026 (quantile feasibility envelope);
-  - Nguyen & Yurko 2026 (multilevel step-and-turn);
-  - Shteynberg et al. 2025 (quantile A–S effort, NFL).
-- Prior work supports that match peak speed underestimates maximal sprint speed, and that this depends on situation and position.
-- The crossed-design bootstrap issue has substantial prior work (Owen 2007; Owen & Eckles 2012).
+- At F level: none of the three closest recent works estimates a per-athlete latent speed capacity with exposure modelling, pooling and uncertainty, or validates one externally.
+  - §2.1 uses an exposure-naive 99th-percentile v_max as a known input.
+  - §2.2 fits independent per-player 0.95 quantile curves to measure effort.
+  - §3.5 estimates a hierarchical *mean* step length.
+- At A/S/K level: the statistical ingredients of G1 already exist in the frontier and EVT literatures (§2.3–2.5). A G1 that only combines them is not an algorithmic contribution.
+- Match peak speed underestimates maximal sprint speed, depending on situation and position (S).
+- The crossed-design bootstrap issue has substantial prior work (Owen 2007; Owen & Eckles 2012; S).
 
 **It cannot support:**
-- **Any novelty claim.** The CLAUDE.md rule requires full-text reading of the closest work, and none was possible.
-- Details of assumptions, baselines, metrics and stated limitations for the S-level entries.
+- **Any novelty claim.** Absence of an application in our searches is not evidence that none exists, and the priority-2 works are still not read in full.
+- Claims about the TTA supplement (§A.1–A.4), the Shteynberg written report, or the step-and-turn code.
+- Whether Spearing et al. 2021 include athlete-level effects, or whether panel SFA papers model the number of draws (abstract or title only).
 - A complete survey of Big Data Bowl finalists.
-- A check of whether panel or hierarchical SFA, or extreme-value methods for athlete maxima, already solve the candidate gap.
 
-**Required next step before Phase 8 can be closed:** in a session where the allowed hosts actually resolve, read in full:
-- 2.1, 2.2 and 3.5 (priority 1);
-- 1.1, 1.2, 2.3/2.4 and their panel/hierarchical extensions, 3.1 and 3.2 (priority 2);
-- then update this file's evidence levels to F.
+**Remaining full-text gaps (priority 2):**
+- 1.1, 1.2, 2.3 (Greene 2005, Koop et al. 1997, Battese & Coelli 1995);
+- 2.4 (Hall & Simar 2002, Kneip et al. 2015);
+- 2.5 (Spearing et al. 2021, Einmahl & Magnus 2008);
+- 3.1, 3.2.

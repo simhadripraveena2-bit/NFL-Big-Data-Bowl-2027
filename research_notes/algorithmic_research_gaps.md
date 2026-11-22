@@ -4,7 +4,26 @@
 - `related_work_full_text_review.md` and `existing_method_comparison.md`: literature at abstract or search level only; no full text read in Phase 8.
 - Our completed empirical study: Phases 1–7.
 
-**Caveat on every candidate.** "Insufficient existing methods" means *insufficient among the methods we could verify at abstract or search level*. **No candidate is claimed to be novel.** A full-text check of the closest work, listed per candidate, is a precondition.
+**Caveat on every candidate.** "Insufficient existing methods" means *insufficient among the methods we could verify*. **No candidate is claimed to be novel.**
+
+## Phase 8B verdict (full-text evidence; supersedes the G1 "possible contribution" below)
+
+- **The three closest works were read in full** (TTA preprint plus code; effort poster; step-and-turn preprint with appendices).
+- **None of them solves G1.** None estimates a per-athlete latent speed capacity that accounts for exposure, pools athletes, gives per-athlete uncertainty and is validated externally (`existing_method_comparison.md` §4).
+- **However, the *method* proposed for G1 is not an original algorithm.** Each of its components is existing method:
+
+  | G1 component (Phase 8) | existing method | evidence |
+  |---|---|---|
+  | capacity = boundary; per-play deficit u_ij ≥ 0 | SFA (Aigner 1977); partial frontiers (Daouia) | S/K |
+  | deficit depends on context | inefficiency determinants (Battese & Coelli 1995) | S/K |
+  | athlete-level pooling, per-athlete intervals | Bayesian individual-effects / true-RE SFA (Koop et al. 1997; Greene 2005); NFL hierarchical step-length model (Nguyen & Yurko 2026) | S/K; **F** |
+  | observed maxima depend on how many chances occur | point-process / GPD best-performance models with occurrence rate and covariates (Spearing et al. 2021); endpoint estimation (Einmahl & Magnus 2008) | A |
+  | tracking noise in the tail | boundary estimation under observation error (Hall & Simar 2002; Kneip et al. 2015) | A; S |
+  | conditional quantile envelope from tracking | TTA (Gutiérrez-Pérez & Agudo 2026); per-player QR / QGAM (Shteynberg 2025) | **F** |
+
+- Under the project lead's rule ("do not assume that combining existing methods constitutes an original contribution"), **G1 as an algorithmic contribution is rejected.**
+- **G1 is reformulated as G1′** (below): an empirical identification and validation question that existing work leaves open. **G1′ is not a new algorithm.** On its own it does not meet CLAUDE.md research standard 3.
+- **No defensible *algorithmic* gap is established by the current evidence for any candidate** (see the revised summary). Whether to proceed with an empirical contribution, or to stop the algorithmic track, is the project lead's decision.
 
 ## Empirical facts motivating the candidates (from our own study)
 
@@ -67,6 +86,39 @@ rather than equality of levels.
 4. **Simulation** with known θ_i and realistic opportunity distributions (Phase 4-style real-design skeletons).
 5. **Baselines:** max, top-5 mean, 99th percentile, Miguens-style A–S S0, SFA, per-athlete quantile regression, and a hierarchical Gaussian mean model. Identical splits; paired significance tests.
 
+## G1′ (Phase 8B reformulation). Is game top speed exposure-biased, and which existing estimator recovers an independently measured capacity?
+
+**Status: empirical / validation question. Not an algorithm. Not claimed novel.**
+
+**What the full texts leave open (F level):**
+- **TTA** uses a 99th-percentile per-player v_max as a known input. It shows this input improves arrival-time MAE by 0.025 s, but never checks whether the input is a valid, exposure-invariant capacity. The authors' code flags "cameo players" and look-ahead leakage.
+- **The effort poster** finds that backup RBs (fewer snaps) score highest on effort relative to their own quantile frontier. This is consistent with, though not shown to be, an exposure artefact of per-player frontiers.
+- **Step-and-turn** gives hierarchical posterior player effects for *mean* step length, without external validation.
+- In all three, the question "does a game-derived player speed trait measure capacity, independent of how much opportunity the player had?" is **not tested**.
+
+**Precise question:**
+- (Q1) Does each estimator's value for a player drift with that player's exposure (number of plays, opportunity mix), within position?
+- (Q2) Which existing estimator agrees best with combine tracked peak speed for the same players, on held-out players and season-forward splits?
+- (Q3) Are the per-athlete intervals calibrated?
+
+The estimators come from the families verified above: M1 max / top-k / 99th percentile (the TTA input); M3b per-player QR; M7 hierarchical mean; M4b RE-SFA with deficit determinants; M10 rate-aware EVT endpoint.
+
+**Why it matters:**
+- A game-derived "top speed" is used as a player input in published models: TTA's v_max (F); da Silva 2025 pitch control (S).
+- If it is exposure-biased, those inputs inherit the bias.
+- The answer is decision-relevant for scouting ("slower, or just not asked to run?").
+
+**What our data uniquely allows:** the same athletes have an independent standardised measurement (combine tracked 40 peak speed, within-position R_x 0.94–0.99, about 330–418 players with game data). None of the reviewed works had this.
+
+**Limits that must be stated up front:**
+- Combine straight-line peak speed is a different construct from game capacity (Phase 2: game levels far lower; within-position rank transfer 0.13–0.73). Agreement can only be judged on ranks and calibration after a position offset, not on levels.
+- Exposure is not randomly assigned: players with more plays differ (G3). Subsampling a player's own plays tests estimator drift (Q1), but not selection.
+- The result may be negative: no estimator beats the simple maximum. That would be a valid finding.
+
+**Possible algorithmic element: a candidate only, not claimed.** A per-play *attainable speed* bound derived from the play's own straight-line run-up (distance and time available), used to separate "no opportunity" plays from "sub-maximal on an opportunity" plays.
+- On current evidence this is a **specification choice within existing classes**: a deficit determinant (Battese–Coelli), or a censoring indicator.
+- It would count as a contribution only if a full-text check of the priority-2 works (§8 of the review) finds no equivalent **and** it measurably improves Q1–Q3 over M4b/M10 on identical splits. **Neither condition is met now.**
+
 ## G2. Noise-robust estimation of acceleration, braking and turning capacity with physical consistency
 
 **Precise problem.** Estimate per-athlete acceleration, deceleration and lateral or turning capacity curves (as functions of speed) from 10 Hz positions, where:
@@ -95,6 +147,12 @@ rather than equality of levels.
 - test–retest stability across seasons;
 - combine 40 acceleration as a partial anchor;
 - baselines: M2, M3b, M6 + envelope.
+
+**Phase 8B update.**
+- Per-player 0.95 QR / QGAM acceleration–deceleration curves already exist for NFL RBs (Shteynberg 2025, F, poster). They have no noise model, pooling or uncertainty.
+- Boundary estimation under observation error is an established problem with a known identifiability limit (Hall & Simar 2002, A).
+- TTA learns a population feasibility envelope that includes the acceleration state (F).
+- The remaining G2 element (a hierarchical, physically constrained feasible-acceleration set with explicit noise) is again largely a combination of existing pieces. Its validation would be mostly synthetic. **Novelty is downgraded.**
 
 ## G3. Identifying capacity separately from deployment: role and context selection
 
@@ -132,7 +190,14 @@ rather than equality of levels.
 
 **Experiments:** null size, coverage and power against Owen–Eckles, the parametric bootstrap and the registered scheme, on identical simulated designs.
 
-## Summary
+## Summary (revised in Phase 8B)
+
+| | G1 (algorithm) | G1′ (empirical) | G2 | G3 | G4 |
+|---|---|---|---|---|---|
+| status after Phase 8B | **rejected as an algorithmic contribution**: every component is existing method | **open** at F level for the closest works; empirical, not algorithmic | novelty downgraded; mostly a combination of existing pieces | unchanged (selection-model literature not reviewed) | unchanged; strong prior work |
+| new algorithm? | no | no (a candidate element, unverified) | not established | possibly (a selection model), weakly identifiable | incremental at most |
+
+The Phase 8 summary table is kept below for the record.
 
 | | G1 exposure-aware capacity | G2 noise-robust acceleration / braking / turning capacity | G3 capacity vs deployment | G4 crossed-design bootstrap |
 |---|---|---|---|---|
