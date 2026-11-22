@@ -92,3 +92,13 @@
 | **2. Realized game movement** | Pooled association with play-maximum speed ρ ≈ 0.55 in both contexts, explained by role and body-type sorting (H1-DL(b) supported); near zero within role |
 | **3. Actual football performance** | **Not analysed.** Pressure (`time_to_pressure`) exists but is not part of the registered H1 analyses. A movement association would not establish a pressure association |
 | **4. Reliability and context** | Player-context reliability is high (0.94 pass rush, 0.86 run). Demand is low in both contexts (D 0.026 / 0.013). The alignment covariate is in every model; the role mix is 25 EDGE and 28 interior |
+
+## 5. Interpretation audit (added 2026-11-22; results and decisions unchanged)
+
+See `dl_role_weight_interpretation.md`. Two clarifications to the text above:
+
+1. **Collinearity is substantial, not extreme.** Within the 53 eligible DL, peak speed vs weight is r = −0.80, and peak speed regressed on role and weight gives R² 0.66 (VIF ≈ 2.9). The adjusted model is therefore identified but imprecise. The phrase "weakly identified" (and the Phase 3 "|ρ| 0.80–0.97" figure, which concerned the 40, split, peak and weight jointly) overstated this.
+2. **The adjusted ρ (−0.27) is not interpretable.**
+   - Conditioning on role alone gives −0.05, and on weight alone −0.08. Within EDGE and within interior, it is ≈ 0.
+   - The registered formula scales the partial slope by the total SD of speed. Using the conditional SD gives −0.16.
+   - The registered *drop* (H1-DL(b), supported) is unaffected.

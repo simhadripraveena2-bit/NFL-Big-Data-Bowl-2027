@@ -119,6 +119,8 @@ pip install -r requirements.txt
 | H1-DL(a) | 0.04 | [−0.23, 0.15] | 1.00 | falsified (registered equivalence-type rule) |
 
 - **H1-DL(b):** the DL association between combine speed and game speed (pooled ρ 0.55) vanishes once EDGE/interior role and body weight are adjusted for. It is role/body-type sorting of game *movement*, not performance evidence.
+  - Interpretation audit (`dl_role_weight_interpretation.md`): the association is ≈ 0 when conditioning on role alone (−0.05), on weight alone (−0.08), or within EDGE (0.05) and within interior (0.01).
+  - The negative adjusted value (−0.27, ±0.45) is an imprecise product of conditioning on two collinear proxies (speed–weight r −0.80, VIF 2.9). It is not interpretable, and not causal.
 - **H1-DL(a):** a pass-rush-vs-run difference of ≥ 0.15 is not supported.
 - **Estimation only:** H5(a), the OL negative control (Δ_OL 0.08 [−0.46, 0.64]), H5(c) and the demand meta-regression are uninformative.
 
