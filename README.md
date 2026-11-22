@@ -84,7 +84,7 @@ pip install -r requirements.txt
 | 5a. H1-WR (sole primary confirmatory test) | ✅ Done — **inconclusive**; notebook 08 |
 | 5b. H1-WR registered robustness + negative control | ✅ Done — conclusion stable |
 | 5c. H2 (secondary, estimation-focused after D4) | ✅ Done — no incremental information detected; notebook 09 |
-| 5d. Secondary family (H1-DB, H1-DL, H5) and TE descriptives | ⏸ Awaiting approval |
+| 5d. Secondary Holm family (H1-DB, H1-DL a/b, H5b), H5(a)/(c), H1-global, TE descriptives | ✅ Done — notebook 10, `research_notes/secondary_family_results.md` |
 
 ## Research summary (current)
 
@@ -108,6 +108,19 @@ pip install -r requirements.txt
 - Tracked peak speed adds **no detectable information** about deep-route separation beyond the official 40: β_P = −0.020 yd per SD, 95 % CI [−0.101, 0.063].
 - No model (not even the 40 alone) predicts held-out players' deep separation better than the position mean.
 - The registered criteria pattern is "inconclusive", because the true-scale partial correlation is not estimable: between-player SD of deep separation is only 0.13 yd.
+
+**Secondary family** (Holm, m = 4; `secondary_family_results.md`):
+
+| hypothesis | estimate | 95 % CI | Holm-adjusted p | decision |
+|---|---|---|---|---|
+| H1-DL(b) | 0.82 | [0.16, 1.54] | 0.032 | **supported** |
+| H1-DB | 0.14 | [−0.61, 1.05] | 1.00 | inconclusive |
+| H5(b) | 0.01 | [−0.57, 0.63] | 1.00 | inconclusive |
+| H1-DL(a) | 0.04 | [−0.23, 0.15] | 1.00 | falsified (registered equivalence-type rule) |
+
+- **H1-DL(b):** the DL association between combine speed and game speed (pooled ρ 0.55) vanishes once EDGE/interior role and body weight are adjusted for. It is role/body-type sorting of game *movement*, not performance evidence.
+- **H1-DL(a):** a pass-rush-vs-run difference of ≥ 0.15 is not supported.
+- **Estimation only:** H5(a), the OL negative control (Δ_OL 0.08 [−0.46, 0.64]), H5(c) and the demand meta-regression are uninformative.
 
 | 3. Modelling & novel algorithm | — |
 | 4. Write-up & submission | — |
