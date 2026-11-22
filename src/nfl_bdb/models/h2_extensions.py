@@ -184,8 +184,17 @@ def eiv_grid(m, n, sw2, F, x, rel_F_grid=(0.85, 0.90, 0.95, 0.99), rel_x_grid=(0
     return rows
 
 
+def admissible_rel_F(F, x, rel_x):
+    """EIV is defined only where the corrected predictor covariance stays positive definite: R_F > r(F, x)^2 / R_x."""
+    r = float(np.corrcoef(F, x)[0, 1])
+    return r ** 2 / rel_x
+
+
 def tipping_point(m, n, sw2, F, x, rel_x, lo=0.5, hi=0.9999):
-    """R_F at which the EIV beta_P crosses 0 (None if no sign change on [lo, hi])."""
+    """R_F at which the EIV beta_P crosses 0 (None if no sign change on the ADMISSIBLE part of [lo, hi]).
+    Fixed after the H2 run: the first version searched below the admissibility bound and returned the singularity
+    (where beta_P flips sign through infinity) as a 'tipping point'. No estimate was affected."""
+    lo = max(lo, admissible_rel_F(F, x, rel_x) + 1e-3)
     f = lambda rf: cf.eiv_two_stage(m, n, sw2, F, x, rel_F=rf, rel_x=rel_x)[1]  # noqa: E731
     try:
         fl, fh = f(lo), f(hi)

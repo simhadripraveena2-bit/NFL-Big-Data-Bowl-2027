@@ -48,3 +48,12 @@ def test_eiv_tipping_point_and_bootstrap_shapes():
 def test_precision_artefact_zero_when_forty_perfect():
     assert abs(h2.precision_artefact(0.8, 1.0, 1.0, 0.5)) < 1e-6
     assert h2.precision_artefact(0.814, 0.90, 0.987, 0.6) > 0.05
+
+
+def test_tipping_point_never_returns_the_eiv_singularity():
+    rng = np.random.default_rng(9); P = 60
+    F = rng.standard_normal(P); x = 0.85 * F + np.sqrt(1 - 0.85 ** 2) * rng.standard_normal(P)
+    m = 0.05 * F - 0.02 * x + 0.1 * rng.standard_normal(P); n = np.full(P, 100.0)
+    bound = h2.admissible_rel_F(F, x, 0.987)
+    tp = h2.tipping_point(m, n, 1.0, F, x, 0.987)
+    assert tp is None or tp > bound + 1e-4

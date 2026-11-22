@@ -77,7 +77,38 @@ pip install -r requirements.txt
 | 1.5 Literature review & research gaps | ✅ Done — `research_notes/` |
 | 1.6 Feasibility simulations (B + C) | ✅ Done — notebooks 02–03, `research_notes/*feasibility*.md` |
 | 2. Real-data feasibility validation | ✅ Done — notebooks 04–05, `research_notes/` |
-| 3. Next phase (TBD) | ⏸ Awaiting approval |
+| 3. Outcome-blind hypothesis screening | ✅ Done — `research_notes/phase3_hypothesis_screening.md` |
+| 3.5 Pre-registration & power | ✅ Done — `research_notes/preregistration.md` (frozen v1.0 + deviations log §15), notebook 06 |
+| 4. Synthetic validation of the confirmatory pipeline | ✅ Done — `research_notes/synthetic_validation.md`, notebook 07 |
+| 4.5 Pre-join decisions, single combine × outcome join, pre-model audit | ✅ Done — D1–D4 in §15, `join_validation_report.md`, `pre_model_audit.md` |
+| 5a. H1-WR (sole primary confirmatory test) | ✅ Done — **inconclusive**; notebook 08 |
+| 5b. H1-WR registered robustness + negative control | ✅ Done — conclusion stable |
+| 5c. H2 (secondary, estimation-focused after D4) | ✅ Done — no incremental information detected; notebook 09 |
+| 5d. Secondary family (H1-DB, H1-DL, H5) and TE descriptives | ⏸ Awaiting approval |
+
+## Research summary (current)
+
+**Title:** *Task-Conditioned Translation of Athletic Capacity: Connecting NFL Combine Sensor Tracking to Regular-Season Football Performance.*
+
+**H1-WR (sole primary, pre-registered; `research_notes/h1_wr_confirmatory_results.md`).**
+- **Hypothesis:** combine tracked peak speed is more strongly associated with in-game speed on deep routes than on short routes (Δ = ρ_deep − ρ_short > 0).
+- **Sample and method:** 57 WRs and 19,960 REG route plays; REML mixed model with a full REML player-cluster bootstrap (B = 2,000).
+- **Result: Δ̂ = 0.090** (ρ_deep 0.576, ρ_short 0.486), **95 % CI [−0.089, 0.400]**, p = 0.21. The 2025 season-forward sign agrees.
+- **Decision: INCONCLUSIVE.** Not supported (the CI includes 0) and not falsified (the 90 % upper bound 0.33 > SESOI 0.15).
+- **Interpretation:** combine peak speed translates into game speed on short routes about as strongly as on deep routes. The raw slopes are about 0.11 yd/s per 0.25 yd/s in both contexts.
+
+**H1-WR robustness** (`h1_wr_robustness_results.md`, `h1_wr_negative_controls.md`, `h1_wr_bootstrap_diagnostics.md`):
+- Every registered full-sample variant gives Δ̂ 0.073–0.119, with a CI including 0.
+- Leave-one-team-out: 0.035–0.125.
+- The permutation negative control is centred at 0.
+- The Wald check gives 95 % CI [−0.114, 0.294].
+- The BCa interval's downward shift is traced to a known property of the registered bootstrap; the percentile interval stays primary.
+
+**H2** (secondary, estimation-focused; `h2_estimation_results.md`):
+- Tracked peak speed adds **no detectable information** about deep-route separation beyond the official 40: β_P = −0.020 yd per SD, 95 % CI [−0.101, 0.063].
+- No model (not even the 40 alone) predicts held-out players' deep separation better than the position mean.
+- The registered criteria pattern is "inconclusive", because the true-scale partial correlation is not estimable: between-player SD of deep separation is only 0.13 yd.
+
 | 3. Modelling & novel algorithm | — |
 | 4. Write-up & submission | — |
 
