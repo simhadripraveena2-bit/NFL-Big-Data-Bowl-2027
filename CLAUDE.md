@@ -104,7 +104,9 @@ Every proposed direction, experiment and final result is judged against all thre
 - D4 approved (Option A): H2 demoted to secondary, estimation-focused (logged in §15). Hierarchy: H1-WR sole primary; H2 secondary estimation; Holm secondary family {H1-DB, H1-DL(a), H1-DL(b), H5(b)} unchanged; H5(a)/(c), H1-global estimation; TE descriptive.
 - Pre-model audit passed (`research_notes/pre_model_audit.md`, `scripts/run_pre_model_audit.py`): frozen code unchanged, single join unchanged, rules re-verified, sample sizes = registered.
 - **H1-WR confirmatory analysis done (run 20261121T223645Z, commit 8674e80, seed 4004, B = 2000): INCONCLUSIVE.** Delta = 0.090 (rho deep 0.576 / short 0.486), 95% CI [-0.089, 0.400], SE 0.122, p = 0.211; 2025 season-forward same sign (0.219); not falsified (90% upper 0.333 > 0.15). Equal raw slopes (~0.11 yd/s per 0.25 yd/s). See `research_notes/h1_wr_confirmatory_results.md`, notebook 08. The runner refuses a second run.
-- Secondary analyses (H2, Holm family, H5, TE) and the H1-WR robustness grid: **not run — awaiting review.**
+- H1-WR registered robustness + negative control done (run 20261121T233918Z, commit a18a1d8): all full-sample variants Delta 0.073-0.119, every CI includes 0; LOTO 0.035-0.125; spline not preferred by CV; N1 permutation centred at 0.003 (no artefact); R10 eligibility weights not computable with the frozen engine. BCa shift is a bootstrap artefact (z0 -0.368 = Phase 4 bootstrap-world value at true Delta 0.2, REML unbiased); Wald check SE 0.104, 95% [-0.114, 0.294]. Notes: `h1_wr_robustness_results.md`, `h1_wr_negative_controls.md`, `h1_wr_bootstrap_diagnostics.md`.
+- Secondary analyses (H2, Holm family, H5, TE) and negative controls N2/N3: **not run — awaiting review.**
+- Spawn, never fork, process pools after polars has been used (fork deadlocked the first robustness attempt).
 - Confirmatory H1 must use `confirmatory.h1_registered_test` (full REML bootstrap, B = 2000). Never `h1_procedure`.
 
 ## Data facts that must not be forgotten (verified in Phases 1–1.5)
