@@ -74,13 +74,16 @@
 - This is evidence **against a meaningful difference** of that size. It is not evidence that the difference is exactly zero.
 - The falsification rule uses the unadjusted 90 % interval, as registered.
 
-**H1-DL(b): role sorting.**
-- The strong DL association between combine peak speed and game play-maximum speed (ρ ≈ 0.55) **disappears once the player's role (EDGE vs interior) and body weight are accounted for**.
-- Within EDGEs, and within interior linemen, separately, the association is near zero (exploratory subgroups).
-- **Reading:** across DL, faster combine athletes are mostly lighter EDGE players, who run faster in games because of their role and size. Among players of the same role and weight, combine peak speed shows no detectable link to game speed.
+**H1-DL(b): sensitivity to role and body weight.**
+- **Registered statistical result:** supported after Holm adjustment (p = 0.008; Holm-adjusted p = 0.032).
+- **Wording (final, after the interpretation audit):** the pooled DL association between combine peak speed and game play-maximum speed (ρ ≈ 0.55) is **substantially sensitive to adjustment for role (EDGE vs interior) and body weight**.
+- **Descriptive audit** (`dl_role_weight_interpretation.md`, not a test):
+  - role alone and weight alone **each remove most of the pooled association** (pooled ρ −0.05 and −0.08);
+  - within EDGEs and within interior linemen the association is near zero (exploratory subgroups).
+- **Not claimed:** that the joint role-and-weight model uniquely identifies the mechanism. Role, weight and speed form one correlated athletic profile, and these data cannot separate them.
 
 **Necessary caveats:**
-- **Collinearity.** In DL, combine speed, the 40, the 10-yd split and weight are close to one dimension (|ρ| 0.80–0.97; Phase 3). The adjusted model asks for the speed effect at fixed weight and role, which is weakly identified. Hence the wide adjusted-ρ CIs and the implausibly negative point estimates. The registered quantity is the *drop*, and the drop is well outside 0. The adjusted ρ itself should not be read as "speed slows DL down".
+- **Collinearity.** In DL, combine speed, the 40, the 10-yd split and weight are close to one dimension (|ρ| 0.80–0.97; Phase 3). The adjusted model asks for the speed effect at fixed weight and role, which is weakly identified (*corrected in §5: identified but imprecise, VIF ≈ 2.9*). Hence the wide adjusted-ρ CIs and the implausibly negative point estimates. The registered quantity is the *drop*, and the drop is well outside 0. The adjusted ρ itself should not be read as "speed slows DL down".
 - **Mediation.** Role is partly a consequence of athletic profile: lighter, faster players are deployed on the edge. The adjusted estimate is therefore not "the effect of speed". It is the association that remains within role and body type. The registration anticipated this (protocol §7: role as mediator).
 - **Not get-off speed.** The outcome is play-maximum speed, not get-off time or pass-rush success. **Nothing here is performance evidence**, and get-off is not interpreted as independent evidence.
 
@@ -89,7 +92,7 @@
 | category | what the data say for DL |
 |---|---|
 | **1. Combine athletic capacity** | Tracked 40 peak speed (within-DL best-of-2 reliability ≈ 0.99, D3), but nearly collinear with weight, the 40 and the 10-yd split |
-| **2. Realized game movement** | Pooled association with play-maximum speed ρ ≈ 0.55 in both contexts, explained by role and body-type sorting (H1-DL(b) supported); near zero within role |
+| **2. Realized game movement** | Pooled association with play-maximum speed ρ ≈ 0.55 in both contexts. It is substantially sensitive to role and body-weight adjustment (H1-DL(b) supported); near zero within role |
 | **3. Actual football performance** | **Not analysed.** Pressure (`time_to_pressure`) exists but is not part of the registered H1 analyses. A movement association would not establish a pressure association |
 | **4. Reliability and context** | Player-context reliability is high (0.94 pass rush, 0.86 run). Demand is low in both contexts (D 0.026 / 0.013). The alignment covariate is in every model; the role mix is 25 EDGE and 28 interior |
 

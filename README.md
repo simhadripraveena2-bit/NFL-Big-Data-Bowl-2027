@@ -88,6 +88,8 @@ pip install -r requirements.txt
 
 ## Research summary (current)
 
+The consolidated final summary, with claims, non-claims, limitations and opportunities, is in [`research_notes/research_findings_summary.md`](research_notes/research_findings_summary.md).
+
 **Title:** *Task-Conditioned Translation of Athletic Capacity: Connecting NFL Combine Sensor Tracking to Regular-Season Football Performance.*
 
 **H1-WR (sole primary, pre-registered; `research_notes/h1_wr_confirmatory_results.md`).**
@@ -118,9 +120,17 @@ pip install -r requirements.txt
 | H5(b) | 0.01 | [−0.57, 0.63] | 1.00 | inconclusive |
 | H1-DL(a) | 0.04 | [−0.23, 0.15] | 1.00 | falsified (registered equivalence-type rule) |
 
-- **H1-DL(b):** the DL association between combine speed and game speed (pooled ρ 0.55) vanishes once EDGE/interior role and body weight are adjusted for. It is role/body-type sorting of game *movement*, not performance evidence.
-  - Interpretation audit (`dl_role_weight_interpretation.md`): the association is ≈ 0 when conditioning on role alone (−0.05), on weight alone (−0.08), or within EDGE (0.05) and within interior (0.01).
-  - The negative adjusted value (−0.27, ±0.45) is an imprecise product of conditioning on two collinear proxies (speed–weight r −0.80, VIF 2.9). It is not interpretable, and not causal.
+- **H1-DL(b)**
+  - **Registered statistical result:** supported after Holm adjustment (p = 0.032).
+  - **Interpretation:** the pooled DL association between combine speed and game speed (ρ 0.55) is substantially sensitive to adjustment for EDGE/interior role and body weight.
+  - **Descriptive audit** (`dl_role_weight_interpretation.md`):
+    - role alone (−0.05) and weight alone (−0.08) each remove most of the pooled association;
+    - within EDGE (0.05) and within interior (0.01) linemen it is near zero.
+  - **Not claimed:**
+    - that the joint role-and-weight model uniquely identifies the mechanism;
+    - that the adjusted negative value (−0.27 ± 0.45) has a causal or substantive meaning.
+  - Collinearity is substantial but not extreme: speed–weight r −0.80, VIF 2.9. The earlier wording "weakly identified" has been corrected.
+  - This concerns game *movement*, not performance.
 - **H1-DL(a):** a pass-rush-vs-run difference of ≥ 0.15 is not supported.
 - **Estimation only:** H5(a), the OL negative control (Δ_OL 0.08 [−0.46, 0.64]), H5(c) and the demand meta-regression are uninformative.
 

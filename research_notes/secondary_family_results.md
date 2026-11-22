@@ -25,7 +25,7 @@
 
 | hypothesis | estimate | 95 % CI | Holm step / level | Holm-level CI | p unadjusted | **p Holm-adjusted** | registered decision |
 |---|---|---|---|---|---|---|---|
-| H1-DL(b): pooled − adjusted DL ρ (role/weight sorting) | 0.816 | [0.160, 1.538] | 1 / 0.0125 | [0.031, 1.659] | 0.008 | **0.032** | **SUPPORTED** |
+| H1-DL(b): pooled − adjusted DL ρ (sensitivity to role/weight adjustment) | 0.816 | [0.160, 1.538] | 1 / 0.0125 | [0.031, 1.659] | 0.008 | **0.032** | **SUPPORTED** |
 | H1-DB: ρ_man − ρ_underneath | 0.139 | [−0.609, 1.050] | 2 / 0.0167 | [−0.820, 1.240] | 0.691 | 1.00 | inconclusive |
 | H5(b): Δ_WR − Δ_OL | 0.007 | [−0.573, 0.627] | 3 / 0.025 | [−0.744, 0.739] | 0.833 | 1.00 | inconclusive |
 | H1-DL(a): ρ_pass-rush − ρ_run | 0.038 | [−0.229, 0.154] | 4 / 0.05 | [−0.229, 0.154] | 0.931 | 1.00 | **falsified** (registered equivalence-type rule: 90 % upper bound 0.124 < 0.15) |
@@ -34,7 +34,7 @@
 - Holm step-down: H1-DL(b) is rejected at 0.0125 (p = 0.008). The procedure then stops at H1-DB (0.691 > 0.0167).
 - Adjusted p-values are the monotone Holm adjustments.
 - "Falsified" follows the registered §12 rule, which uses the unadjusted 90 % interval. It means a SESOI-sized pass-rush-vs-run difference is not supported. It does not mean the difference is exactly zero.
-- **The one supported secondary result (H1-DL(b)) is a role-sorting result about game movement.** It is not a performance result (see `dl_secondary_results.md` for the collinearity and mediation caveats).
+- **The one supported secondary result (H1-DL(b))** shows that the pooled DL combine-speed/game-speed association is substantially sensitive to role and body-weight adjustment. Descriptively, role alone and weight alone each remove most of it (`dl_role_weight_interpretation.md`). No mechanism is uniquely identified, and the result concerns game movement. It is not a performance result (see `dl_secondary_results.md` for the collinearity and mediation caveats).
 
 **§9 sensitivity** (Holm over the original {H1-WR, H1-DB, H2}; reported only as a sensitivity analysis):
 - p = 0.211 / 0.691 / 0.708; Holm-adjusted 0.633 / 1.00 / 1.00; nothing rejected.
@@ -66,7 +66,7 @@
 **What is consistent across positions:**
 - **No position shows a resolved within-position task contrast.** Every Δ CI includes 0, and the DL contrast is bounded below the SESOI.
 - What differs strongly is the **overall level** of translation: WR and DL ≈ 0.5–0.6; DB and TE ≈ 0.15–0.3; OL ≈ 0.03–0.1.
-- In DL, that overall level is explained by role and body-type sorting (H1-DL(b)).
+- In DL, that overall level is substantially sensitive to role and body-weight adjustment (H1-DL(b)); no unique mechanism is identified.
 - This pattern does not follow the near-top-speed demand gradient in any testable way: the H1-global λ is uninformative.
 
 ## 5. Interpretation rules applied to every position

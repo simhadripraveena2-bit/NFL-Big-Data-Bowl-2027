@@ -124,7 +124,10 @@ Same registered model and outcome. Pooled = mean of the context ρ. Wald SEs.
 4. **Statistical instability.** The adjusted ρ has SE ≈ 0.23. Its sign changes across reasonable conditioning sets (§5), and its magnitude depends on the SD convention (§4).
 5. **Outcome.** Play-maximum speed is *realized game movement*, not get-off time and not pass-rush performance. Even a causal speed → movement effect would not establish a speed → performance effect.
 
-**What H1-DL(b) does establish (registered, Holm-adjusted):** the pooled DL association between combine peak speed and game speed is explained by the role and body-type differences between EDGE and interior linemen. That is a descriptive, sorting statement about where the association comes from. **It is not a statement that speed has no effect, or a negative effect.**
+**What H1-DL(b) establishes (registered, Holm-adjusted p = 0.032):** the pooled DL association between combine peak speed and game speed is **substantially sensitive to adjustment for role and body weight**.
+- Descriptively, role alone and weight alone each remove most of it (§5).
+- This is a statement about where the association sits in the athletic profile. It does **not** uniquely identify a mechanism (role, weight and speed are one correlated profile).
+- **It is not a statement that speed has no effect, or a negative effect.**
 
 ## 7. Consistency across EDGE and interior groups
 
@@ -137,7 +140,7 @@ Same registered model and outcome. Pooled = mean of the context ρ. Wald SEs.
 
 **Reading:**
 - Within each role, the association between combine peak speed and game speed is about zero, in both contexts.
-- This agrees with the role-conditioned full-sample estimate (−0.05) and with the role-sorting reading of H1-DL(b).
+- This agrees with the role-conditioned full-sample estimate (−0.05) and with the sensitivity reading of H1-DL(b).
 - It does **not** reproduce the negative "role and weight" estimate, which supports treating that value as unstable rather than substantive.
 - The subgroups are small (25 and 28). Their SEs (≈ 0.21–0.25) do not exclude moderate within-role associations of either sign. **"About zero" means "no detectable association", not "no association".**
 
@@ -146,7 +149,9 @@ Same registered model and outcome. Pooled = mean of the context ρ. Wald SEs.
 | statement | status |
 |---|---|
 | Across DL, combine peak speed is associated with game play-maximum speed (ρ ≈ 0.55) | descriptive, registered model |
-| This association is accounted for by EDGE/interior role and body weight (Δ_b = 0.82, 95 % CI [0.16, 1.54]) | **registered secondary hypothesis H1-DL(b), supported after Holm** |
+| This association is substantially sensitive to adjustment for EDGE/interior role and body weight (Δ_b = 0.82, 95 % CI [0.16, 1.54]) | **registered secondary hypothesis H1-DL(b), supported after Holm (p = 0.032)** |
+| Role alone and weight alone each remove most of the pooled association | descriptive (this audit) |
+| The joint role-and-weight model identifies the mechanism | **not claimed** |
 | Conditional on role, or on weight, alone: ≈ 0; within EDGE and within interior: ≈ 0 | descriptive; consistent with the above |
 | The adjusted value −0.27 | **not interpretable**: imprecise (±0.45), sign unstable across conditioning sets, inflated by the total-SD scaling, not causal |
 | Speed causes (or does not cause) DL game speed or pass-rush success | **not addressed by these data** |
