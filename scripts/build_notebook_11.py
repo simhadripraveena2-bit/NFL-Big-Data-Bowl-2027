@@ -96,10 +96,13 @@ def find_code_dir():
     raise FileNotFoundError('pipeline code not found: attach the nfl-bdb-2027 pipeline-code dataset')
 
 DATA = find_data_dir(); CODE = find_code_dir()
-WORK = Path(os.environ.get('NFL_BDB_WORK') or (str(KAGGLE_WORKING / 'nfl_bdb_work') if IS_KAGGLE else tempfile.mkdtemp(prefix='nfl_bdb_work_')))
+# Scratch files (Parquet copies of the competition CSVs, play features) go to a temporary directory under /tmp.
+# Never /kaggle/working: Kaggle saves that folder as notebook output, which would expose competition data copies.
+WORK = Path(os.environ.get('NFL_BDB_WORK') or tempfile.mkdtemp(prefix='nfl_bdb_work_'))
 WORK.mkdir(parents=True, exist_ok=True)
 # safety: never write into the repository's registered data directory
 assert 'data/interim' not in str(WORK.resolve()), 'work directory must not be the registered data/interim'
+assert not str(WORK.resolve()).startswith(str(KAGGLE_WORKING.resolve())), 'work directory must not be inside /kaggle/working (saved as output)'
 sys.path[:0] = [str(CODE / 'src'), str(CODE / 'scripts')]
 _v = tuple(int(x) for x in pl.__version__.split('.')[:2])
 assert _v >= (1, 0), f'polars >= 1.0 required (found {pl.__version__}); run: pip install -U polars'
@@ -336,8 +339,15 @@ md("""
 md("## 8. Figures (as in the writeup), drawn from the registered results")
 code(r"""
 sf.apply_style()
+rendered = []
 for name, fn in sf.FIGURES.items():
-    fig = fn(REGISTERED); plt.show(); plt.close(fig)
+    fig = fn(REGISTERED)
+    w, h = (fig.get_size_inches() * fig.dpi).round().astype(int)
+    rendered.append((name, int(w), int(h), len(fig.axes)))
+    plt.show(); plt.close(fig)
+print(pl.DataFrame(rendered, schema=['figure', 'width_px', 'height_px', 'axes'], orient='row'))
+assert len(rendered) == 7 and all(r[3] >= 1 for r in rendered), 'expected 7 rendered figures'
+print('figures rendered:', len(rendered))
 """)
 
 md("""
@@ -354,6 +364,23 @@ md("""
 **Why the confirmatory fits are not re-run.** Each runner (`scripts/run_h1_wr_confirmatory.py`, `run_h2_estimation.py`, `run_secondary.py`) refuses to run a second time. Silently re-running them would turn a single pre-registered test into a repeatable one.
 
 An auditor can repeat a fit in the project repository on a fresh copy, under a new run ID labelled as a *reproduction*, with approval. That reproduction would be compared with, but never replace, the registered result. The full REML bootstraps (B = 2,000) take roughly 20–60 minutes per family on 4 CPUs.
+""")
+
+md("""
+## 10. Clean-up: no competition data left in the notebook outputs
+
+The scratch directory with Parquet copies of the competition files is deleted. The check then confirms that nothing data-like (CSV, Parquet, NumPy) was written to `/kaggle/working`, the folder Kaggle publishes as notebook output.
+""")
+code(r"""
+import shutil
+shutil.rmtree(WORK, ignore_errors=True)
+print('scratch directory removed:', not WORK.exists())
+if KAGGLE_WORKING.exists():
+    leaked = [str(p) for p in KAGGLE_WORKING.rglob('*') if p.is_file() and p.suffix.lower() in ('.csv', '.parquet', '.npy', '.npz', '.feather', '.zip')]
+    print('data-like files in', KAGGLE_WORKING, ':', leaked or 'none')
+    assert not leaked, 'competition-derived data files found in /kaggle/working'
+import resource
+print(f'peak memory (max RSS) of this kernel: {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024**2:.2f} GB')
 """)
 
 nb["cells"] = C
