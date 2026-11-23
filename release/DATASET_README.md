@@ -1,6 +1,6 @@
 # From Combine Speed to NFL Movement: pipeline code
 
-> **Status: PROPOSED.** This dataset description is pending approval by the project owner.
+> **Status: PROPOSED, revision 2 (Phase 10.2).** This dataset description is pending approval by the project owner and the competition host's licensing clarification.
 
 This dataset holds the code used by the notebook *From Combine Speed to NFL Movement* (NFL Big Data Bowl 2027).
 
@@ -29,6 +29,6 @@ The notebook:
 
 - **Code:** Apache-2.0.
 - **Competition data:** not included; governed by the competition rules (CC BY-NC 4.0, non-commercial, no redistribution).
-- **Aggregate results** (embedded in the notebook and writeup): CC BY-NC 4.0, with attribution to the NFL Big Data Bowl 2027 competition data.
+- **Aggregate results:** not included in this dataset. No licence is asserted for them (see `NOTICE.md`, category 3; awaiting the competition host's clarification).
 
 See `NOTICE.md`.
