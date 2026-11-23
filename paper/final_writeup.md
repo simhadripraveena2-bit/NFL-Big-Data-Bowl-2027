@@ -46,7 +46,7 @@ H2 was planned as a primary test. It was **demoted to a secondary, estimation-fo
 - **The 40 mixes two traits.** In WRs, peak speed and the 10-yard split are only weakly related (ρ = −0.33).
 - **For defensive linemen, tracking adds almost nothing.** Peak speed, the 40, the 10-yard split and weight are nearly one dimension: speed–weight r = −0.80, and only 5% of peak-speed variance is unique.
 
-## 4. When does a play ask for top speed?
+## 4. Players reach near-top game speed more often on deep routes than on short routes
 
 ![Figure 3: plays reaching 90% of own top speed: WR deep 16.9%, WR short 0.8%, DL and OL 3% or less.](figures/fig3_speed_demand.png)
 
@@ -55,7 +55,7 @@ Using game data only, we measured how often a snap pushes a player to within 10%
 - **WR deep routes do so on 17% of snaps, short routes on 1%.**
 - **DL and OL** reach it on 3% of snaps or fewer.
 
-Top speed is a *deep-route* resource. If Combine speed matters anywhere, the natural place is deep routes: that was our primary hypothesis.
+This is a **descriptive game-tracking measure**. It is not a direct measurement of opportunity, and it is not evidence that Combine speed has a stronger effect on deep routes: that question is H1 (next section), and it is inconclusive. The pattern is why the pre-registered test compared deep with short routes.
 
 ## 5. Does Combine top speed show up in game speed? (H1)
 
@@ -94,8 +94,6 @@ This is the Combine-to-performance link. **H2: INCONCLUSIVE. With the official 4
 
 The data can rule out a large added separation signal from tracked top speed. They cannot rule out a small one.
 
-## 7. Why context, role and body weight matter
-
 ![Figure 6: receiver metric reliability before and after context adjustment; short-route separation falls from 0.75 to 0.22.](figures/fig6_reliability.png)
 
 **Separation is mostly deployment.**
@@ -103,9 +101,10 @@ The data can rule out a large added separation signal from tracked top speed. Th
 - After adjusting for route, coverage, down and formation, it falls to 0.61, and **short-route separation falls from 0.75 to 0.22.** Median separation differs by 1.6 yd between man and zone coverage alone.
 - Ranking receivers on raw separation largely ranks how they were used.
 
+## 7. The pooled DL speed association is substantially sensitive to role and body-weight adjustment
+
 ![Figure 7: EDGE lighter and faster than interior; pooled DL correlation 0.55 falls to about zero with role or weight.](figures/fig7_dl_role_weight.png)
 
-**For DL, "Combine speed" is body type and role.**
 - **H1-DL(b) was supported after Holm adjustment (p = 0.032).** The pooled DL association between Combine speed and game speed is **substantially sensitive to role and weight adjustment**:
   - it falls from 0.55 to −0.27 when EDGE/interior role and Combine weight are both adjusted for (registered difference 0.82, 95% CI [0.16, 1.54]);
   - descriptively, role alone (−0.05) or weight alone (−0.08) removes most of it;
@@ -118,10 +117,10 @@ The data can rule out a large added separation signal from tracked top speed. Th
 |---|---|---|
 | Tracked top speed is reliable (0.94–0.99) and, for WR/DB, about one-third distinct from the 40 | capacity | Record tracked peak speed alongside the 40; don't treat them as interchangeable for WR/DB |
 | WR Combine top speed tracks game top speed about equally on short and deep routes (ρ 0.49–0.58); the deep-route advantage is inconclusive | capacity → movement | Use tracked speed to forecast how fast a receiver will play, not where he will win |
-| Near-top-speed demand is 17% of WR deep routes, ≤ 3% of OL/DL snaps | movement | Weigh top speed by the role's real demand; a short-area receiver rarely uses it |
+| Players reach ≥ 90% of their own top game speed on 17% of WR deep routes vs 1% of short routes, ≤ 3% of OL/DL snaps (descriptive) | movement | Expect game top-speed evidence mainly from deep routes; a short-area role rarely shows it |
 | No detected added value of tracked speed over the 40 for deep separation; small effects not excluded | capacity → performance | Don't pay a separation premium for tracked top speed alone |
 | Raw separation is largely route and coverage context | performance vs deployment | Compare receivers on context-adjusted separation, against the same coverages |
-| DL speed ≈ weight ≈ role | capacity ↔ deployment | Judge a lineman's speed within body type and alignment, not against the whole DL class |
+| The pooled DL speed association is substantially sensitive to role and body-weight adjustment | capacity ↔ deployment | Judge a lineman's speed within body type and alignment, not against the whole DL class |
 
 **Limitations:**
 - **Player numbers, not plays, limit power.** n ≈ 52–57 per position.

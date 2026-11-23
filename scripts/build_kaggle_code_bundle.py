@@ -3,6 +3,7 @@
 Contents (no competition data, no credentials, no experiment outputs):
   src/nfl_bdb/**           the pipeline package (frozen modules unchanged)
   scripts/run_real_capacity.py, scripts/run_phase3_screening.py   (frozen feature stages imported by the notebook)
+  scripts/run_confirmatory_join.py, scripts/run_forty_reliability.py (frozen; shipped so all 12 manifest files can be hash-checked)
   research_notes/code_freeze.json                                  (sha256 manifest checked by the notebook)
   paper/registered_results.json                                    (aggregate registered results)
   dataset-metadata.json, kernel-metadata.json                      (templates; replace <KAGGLE_USERNAME> before use)
@@ -13,14 +14,15 @@ Output: build/kaggle_code_bundle/ (git-ignored). Upload is a manual, owner-appro
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import shutil
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "build" / "kaggle_code_bundle"
-FILES = ["scripts/run_real_capacity.py", "scripts/run_phase3_screening.py", "research_notes/code_freeze.json",
-         "paper/registered_results.json"]
+FILES = ["scripts/run_real_capacity.py", "scripts/run_phase3_screening.py", "scripts/run_confirmatory_join.py",
+         "scripts/run_forty_reliability.py", "research_notes/code_freeze.json", "paper/registered_results.json"]
 FORBIDDEN = (".csv", ".parquet", ".npz", ".npy", ".zip", ".json.bak", "kaggle.json", ".env")
 
 
@@ -45,6 +47,15 @@ def main():
         "competition_sources": ["nfl-big-data-bowl-2027"]}, indent=1))
     bad = [p for p in OUT.rglob("*") if p.is_file() and p.name.endswith(FORBIDDEN) and p.name != "dataset-metadata.json"]
     assert not bad, f"forbidden files in bundle: {bad}"
+    assert not (OUT / "data").exists() and not (OUT / "experiments").exists(), "data/ or experiments/ in bundle"  # src/nfl_bdb/data is code
+    # every frozen file must be present in the bundle and match the registered SHA-256
+    man = json.loads((OUT / "research_notes/code_freeze.json").read_text())["files"]
+    assert len(man) == 12, f"expected 12 manifest entries, found {len(man)}"
+    missing = [f for f in man if not (OUT / f).is_file()]
+    assert not missing, f"frozen files missing from bundle: {missing}"
+    wrong = [f for f, h in man.items() if hashlib.sha256((OUT / f).read_bytes()).hexdigest() != h]
+    assert not wrong, f"frozen files differ from the freeze manifest: {wrong}"
+    print(f"freeze check: {len(man)}/12 frozen files present, all SHA-256 digests match")
     n = sum(1 for p in OUT.rglob("*") if p.is_file()); size = sum(p.stat().st_size for p in OUT.rglob("*") if p.is_file())
     print(f"bundle: {OUT} ({n} files, {size / 1024:.0f} KiB)")
 

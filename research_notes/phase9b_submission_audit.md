@@ -134,3 +134,25 @@ Each figure was reviewed visually after rendering, and overlapping labels and fo
 4. **Link:** add the public notebook link to the writeup appendix.
 5. **Licence:** choose the open-source licence for the code (rules §5 require an OSI licence if the entry wins; the template uses Apache-2.0).
 6. **Final read-through, then submit** before 2027-01-06 23:59 UTC.
+
+## 9. Phase 9B.1 pre-publication corrections (2026-11-23)
+
+| # | correction | change | verification |
+|---|---|---|---|
+| 1 | Kaggle code-directory discovery | `find_code_dir()` now returns `p.parents[2]` for `/kaggle/input/<slug>/src/nfl_bdb/__init__.py`, i.e. the dataset root `/kaggle/input/<slug>`. The old `p.parent.parent` returned `…/src`. It also asserts that the root contains `src/nfl_bdb/__init__.py` and is not named `src`. The Kaggle roots can be overridden (`KAGGLE_INPUT_ROOT`, `KAGGLE_WORKING_ROOT`) only to simulate the layout | Isolated test: `input/my-code-slug` → root `input/my-code-slug`; nested `input/my-code-slug/v1` → `…/v1`. A full notebook run in a simulated layout (`<tmp>/kaggle/input/{nfl-big-data-bowl-2027, nfl-bdb-2027-pipeline-code}`, no repository paths or overrides, cwd outside the repo) resolved data and code to the two dataset roots |
+| 2 | complete code-freeze bundle | the bundle now also ships `scripts/run_confirmatory_join.py` and `scripts/run_forty_reliability.py`, giving 35 files and 274 KiB. The builder asserts 12/12 manifest files present with matching SHA-256, and no top-level `data/` or `experiments/`, CSV, Parquet, npz/npy, zip or credential files | builder: "12/12 frozen files present, all SHA-256 digests match"; credential-string scan: none |
+| 2b | strict notebook freeze check | the manifest must exist and list exactly 12 files; every file must exist; every SHA-256 must match. Otherwise the notebook stops | isolated tests: intact → PASS; deleted `run_forty_reliability.py` → FAIL (missing); edited `run_confirmatory_join.py` → FAIL (digest); deleted manifest → FAIL |
+| 3a | Figure 3 / §4 headline | "Players reach near-top game speed more often on deep routes than on short routes." The writeup and the figure caption state that it is a descriptive game-tracking measure, not a direct measurement of opportunity, and not evidence of a stronger Combine effect on deep routes (H1-WR is inconclusive). The §8 table row is reworded to match | checker items "Fig 3 headline", "Fig 3 descriptive caveat", "Fig 3 title in figure" |
+| 3b | Figure 7 / §7 heading | "The pooled DL speed association is substantially sensitive to role and body-weight adjustment." §7 is now the DL section. The separation-reliability paragraph (Figure 6) moved to the end of §6, the H2 section, which it explains. All registered DL numbers and caveats are unchanged (Holm p = 0.032, 0.82 [0.16, 1.54], not causal, one athletic profile) | checker items "Section 7 heading", "Fig 7 title in figure" + all DL number checks |
+
+**Final verification:**
+- **Notebook rebuilt and executed twice**, both with 0 errors and 7 figures:
+  - local repository mode, 115 s;
+  - simulated Kaggle layout, 34 s.
+  In both runs all 12 frozen files were verified, the tracked-40 predictor table was reproduced (418), and all registered sample sizes were reproduced.
+- **Limits and numbers:** `scripts/check_writeup_numbers.py` passes 43/43 (the 38 original plus 5 headline checks). 1,874 words including alt text and appendix; 7 figures + 2 tables = 9.
+- **No confirmatory model re-run:**
+  - no notebook code cell references a confirmatory runner, REML fit, bootstrap or `join_predictors`;
+  - the 172 files under `experiments/` and `data/interim/confirmatory_join/` are byte-for-byte unchanged (size and mtime) before and after all runs;
+  - `tests/test_code_freeze.py` passes.
+- **Nothing was uploaded or submitted to Kaggle.**

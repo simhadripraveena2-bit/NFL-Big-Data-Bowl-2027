@@ -61,11 +61,18 @@ import numpy as np, polars as pl
 import matplotlib, matplotlib.pyplot as plt
 pl.Config.set_tbl_rows(30); pl.Config.set_tbl_cols(20); pl.Config.set_tbl_width_chars(180)
 
-IS_KAGGLE = Path('/kaggle/input').exists()
+# Kaggle mounts attached datasets under /kaggle/input/<slug>/ and writes to /kaggle/working.
+# The two roots can be overridden only to simulate that layout locally.
+KAGGLE_INPUT = Path(os.environ.get('KAGGLE_INPUT_ROOT', '/kaggle/input'))
+KAGGLE_WORKING = Path(os.environ.get('KAGGLE_WORKING_ROOT', '/kaggle/working'))
+IS_KAGGLE = KAGGLE_INPUT.exists()
 
 def find_data_dir():
-    cands = [os.environ.get('NFL_BDB_DATA'), '/kaggle/input/nfl-big-data-bowl-2027',
-             '/kaggle/input/competitions/nfl-big-data-bowl-2027']
+    cands = [os.environ.get('NFL_BDB_DATA'), str(KAGGLE_INPUT / 'nfl-big-data-bowl-2027'),
+             str(KAGGLE_INPUT / 'competitions/nfl-big-data-bowl-2027')]
+    if IS_KAGGLE:
+        cands += sorted(str(p.parent) for p in KAGGLE_INPUT.glob('*/combine_results.csv'))
+        cands += sorted(str(p.parent) for p in KAGGLE_INPUT.glob('*/*/combine_results.csv'))
     here = Path.cwd()
     cands += [str(p / 'data/raw/nfl-big-data-bowl-2027') for p in (here, here.parent)]
     for c in cands:
@@ -76,17 +83,20 @@ def find_data_dir():
 def find_code_dir():
     cands = [os.environ.get('NFL_BDB_CODE')]
     if IS_KAGGLE:   # the pipeline code is attached as a small Kaggle dataset (src/ + scripts/; no data)
-        cands += [str(p.parent.parent) for p in Path('/kaggle/input').glob('*/src/nfl_bdb/__init__.py')]
-        cands += [str(p.parent.parent) for p in Path('/kaggle/input').glob('*/*/src/nfl_bdb/__init__.py')]
+        # <root>/src/nfl_bdb/__init__.py -> parents[0]=nfl_bdb, [1]=src, [2]=<root> (the dataset root we need)
+        cands += sorted(str(p.parents[2]) for p in KAGGLE_INPUT.glob('*/src/nfl_bdb/__init__.py'))
+        cands += sorted(str(p.parents[2]) for p in KAGGLE_INPUT.glob('*/*/src/nfl_bdb/__init__.py'))
     here = Path.cwd()
     cands += [str(here), str(here.parent)]
     for c in cands:
         if c and (Path(c) / 'src/nfl_bdb/__init__.py').exists():
-            return Path(c)
+            root = Path(c)
+            assert (root / 'src/nfl_bdb/__init__.py').exists() and root.name != 'src', f'bad code root {root}'
+            return root
     raise FileNotFoundError('pipeline code not found: attach the nfl-bdb-2027 pipeline-code dataset')
 
 DATA = find_data_dir(); CODE = find_code_dir()
-WORK = Path(os.environ.get('NFL_BDB_WORK') or ('/kaggle/working/nfl_bdb_work' if IS_KAGGLE else tempfile.mkdtemp(prefix='nfl_bdb_work_')))
+WORK = Path(os.environ.get('NFL_BDB_WORK') or (str(KAGGLE_WORKING / 'nfl_bdb_work') if IS_KAGGLE else tempfile.mkdtemp(prefix='nfl_bdb_work_')))
 WORK.mkdir(parents=True, exist_ok=True)
 # safety: never write into the repository's registered data directory
 assert 'data/interim' not in str(WORK.resolve()), 'work directory must not be the registered data/interim'
@@ -129,18 +139,20 @@ code("REGISTERED = json.loads(r'''" + json.dumps(REG, indent=1) + "''')\n"
 md("""
 ## 2. Code integrity: the frozen pipeline files are unchanged
 
-The confirmatory code was frozen (sha256 manifest `research_notes/code_freeze.json`) before the single Combine-to-game join. If the manifest is available, check it.
+The confirmatory code was frozen (sha256 manifest `research_notes/code_freeze.json`, 12 files) before the single Combine-to-game join. The code bundle ships the manifest and all 12 files. Every file must be present and match its registered SHA-256; anything missing or changed stops the notebook.
 """)
 code(r"""
 import hashlib
 man = CODE / 'research_notes/code_freeze.json'
-if man.exists():
-    m = json.loads(man.read_text())
-    status = {f: hashlib.sha256((CODE / f).read_bytes()).hexdigest() == h for f, h in m['files'].items() if (CODE / f).exists()}
-    print(pl.DataFrame({'file': list(status), 'unchanged': list(status.values())}))
-    assert all(status.values()), 'a frozen file differs from the registered freeze'
-else:
-    print('freeze manifest not attached; skipping (the code dataset ships src/ and scripts/ only)')
+assert man.exists(), f'freeze manifest missing: {man}'
+m = json.loads(man.read_text())['files']
+assert len(m) == 12, f'expected 12 frozen files in the manifest, found {len(m)}'
+missing = [f for f in m if not (CODE / f).is_file()]
+assert not missing, f'frozen files missing from the code bundle: {missing}'
+status = {f: hashlib.sha256((CODE / f).read_bytes()).hexdigest() == h for f, h in m.items()}
+print(pl.DataFrame({'file': list(status), 'sha256_matches_freeze': list(status.values())}))
+assert all(status.values()), f'frozen files differ from the registered freeze: {[f for f, ok in status.items() if not ok]}'
+print('all 12 frozen files present; all SHA-256 digests verified')
 """)
 
 md("""
@@ -245,7 +257,7 @@ if RUN_GAME_PIPELINE:
 """)
 
 md("""
-**Descriptive context (no combine data): how often does a play demand top speed?** This is the share of plays on which a player reaches ≥ 90 % of his own top game speed, where own top speed is the mean of his 5 fastest REG plays. The registered values are shown; see writeup Figure 3.
+**Descriptive context (game tracking only, no combine data): players reach near-top game speed more often on deep routes than on short routes.** The measure is the share of plays on which a player reaches ≥ 90 % of his own top game speed, where own top speed is the mean of his 5 fastest REG plays. It describes what was observed. It is not a direct measurement of opportunity, and it does not show that Combine speed has a stronger effect on deep routes (that was H1-WR, which is inconclusive). The registered values are shown; see writeup Figure 3.
 """)
 code(r"""
 print(pl.DataFrame(REGISTERED['speed_demand']['rows']).sort('pos', 'context'))

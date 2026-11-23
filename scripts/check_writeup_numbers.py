@@ -73,7 +73,16 @@ checks = [
     ("sep adj", f"it falls to {f2(orl[('separation_at_pass_forward', 'adj')])}"),
     ("short sep", f"**short-route separation falls from {f2(orl[('separation_short', 'raw')])} to {f2(orl[('separation_short', 'adj')])}.**"),
 ]
-fails = [(n, e) for n, e in checks if e not in W]
+# Phase 9B.1 mandatory headlines (writeup and figure source)
+FIGSRC = (ROOT / "src/nfl_bdb/visualization/submission_figures.py").read_text()
+H3 = "Players reach near-top game speed more often on deep routes than on short routes"
+H7 = "The pooled DL speed association is substantially sensitive to role and body-weight adjustment"
+checks += [("Fig 3 headline in writeup (section 4)", "## 4. " + H3),
+           ("Fig 3 descriptive caveat", "not a direct measurement of opportunity, and it is not evidence that Combine speed has a stronger effect on deep routes"),
+           ("Section 7 heading", "## 7. " + H7)]
+fig_checks = [("Fig 3 title in figure", "Figure 3. " + H3), ("Fig 7 title in figure", "Figure 7. " + H7)]
+fails = [(n, e) for n, e in checks if e not in W] + [(n, e) for n, e in fig_checks if e not in FIGSRC]
+checks += fig_checks
 for n, e in checks:
     print(("OK  " if (n, e) not in fails else "FAIL"), n, "::", e)
 

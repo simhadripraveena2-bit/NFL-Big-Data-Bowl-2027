@@ -128,9 +128,10 @@ def fig3_speed_demand(R: dict):
         ax.text(v + 0.3, y, f"{v:.1f}%   ({r['plays']:,} plays)", va="center", fontsize=9, color=DARK)
     ax.set_yticks(ys); ax.set_yticklabels([f"{p}: {CTX_NAME[c]}" for p, c in keep])
     ax.set_xlim(0, 25); ax.set_xlabel("% of plays on which the player reaches ≥ 90% of his own top game speed")
-    ax.set_title("Figure 3. Top speed is a deep-route tool: most NFL snaps never ask for it")
-    _note(fig, "REG 2023–25, cohort players. Own top speed = mean of the player's 5 fastest REG plays. Descriptive, game data only "
-               "(no combine values). DL / OL 'pass' = pass-rush / pass-block snaps.", y=-0.02)
+    ax.set_title("Figure 3. Players reach near-top game speed more often on deep routes than on short routes")
+    _note(fig, "REG 2023–25, cohort players. Own top speed = mean of the player's 5 fastest REG plays. Descriptive game-tracking "
+               "measure (no combine values): not a direct measure of opportunity, and not evidence that Combine speed matters more on "
+               "deep routes (H1-WR is inconclusive). DL / OL 'pass' = pass-rush / pass-block snaps.", y=-0.04)
     fig.tight_layout(rect=(0, 0.04, 1, 1))
     return fig
 
@@ -277,7 +278,7 @@ def fig7_dl(R: dict):
     reg = d["registered"]
     a2.set_title(f"B. The pooled DL association is sensitive to role and weight\n"
                  f"registered test (pooled − adjusted) = {reg['estimate']:.2f} [{reg['ci95'][0]:.2f}, {reg['ci95'][1]:.2f}], Holm p = {reg['p_holm']:.3f}", fontsize=11)
-    fig.suptitle("Figure 7. For defensive linemen, 'combine speed' is largely body type and role",
+    fig.suptitle("Figure 7. The pooled DL speed association is substantially sensitive to role and body-weight adjustment",
                  x=0.01, ha="left", fontsize=12, fontweight="bold", y=1.06)
     _note(fig, "DL, n = 53 (25 EDGE / 28 interior), REG 2023–25. B: descriptive audit intervals; only the registered pooled-minus-adjusted "
                "test is inferential. Not causal: role partly results from athleticism; the adjusted value is not a speed effect.", y=-0.1)
