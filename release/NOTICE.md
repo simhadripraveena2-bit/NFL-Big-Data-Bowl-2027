@@ -9,7 +9,7 @@
 
 **Project:** From Combine Speed to NFL Movement (NFL Big Data Bowl 2027 entry)
 
-**Copyright:** 2026 &lt;COPYRIGHT HOLDER: to be confirmed by the project owner&gt;
+**Copyright:** 2026 Simhadri Praveena
 
 This project contains four kinds of material. They are treated separately.
 
