@@ -24,13 +24,13 @@ H2 was planned as a primary test. It was **demoted to a secondary, estimation-fo
 - **Cohort.** 510 prospects (2023–25 classes). 418 have at least one valid tracked 40: a clean acceleration curve (R² > 0.95) and a peak ≤ 12.5 yd/s. 332 of them also have REG game rows.
 - **Unit of inference: the player, not the play.** Analysed samples (≥ 100 qualifying REG snaps):
 
-  | position | players | plays |
-  |---|---|---|
-  | WR | 57 | 19,960 |
-  | DL | 53 | 34,154 |
-  | OL | 53 | 64,285 |
-  | DB | 52 | 16,643 |
-  | TE (descriptive only) | 17 | 4,170 |
+| position | players | plays |
+|---|---|---|
+| WR | 57 | 19,960 |
+| DL | 53 | 34,154 |
+| OL | 53 | 64,285 |
+| DB | 52 | 16,643 |
+| TE (descriptive only) | 17 | 4,170 |
 
 - **Safeguards.** The analysis plan was pre-registered and the code frozen before the single Combine-to-game join. The whole pipeline was first run on simulated data with known effects. Each confirmatory script refuses a second run. Only REG plays are used. A faulty game and speed spikes are removed by rule.
 - **Model.** A linear mixed model estimates each player's *noise-free* game-speed level in each task context, after pre-snap context: route, coverage shell, down, distance, formation, time-to-throw bin, season and NFL year, with a team-season effect.
