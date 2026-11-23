@@ -96,7 +96,7 @@ The data can rule out a large added separation signal from tracked top speed. Th
 
 ![Figure 6: receiver metric reliability before and after context adjustment; short-route separation falls from 0.75 to 0.22.](figures/fig6_reliability.png)
 
-**Separation is mostly deployment.**
+**Receiver separation measurements are sensitive to route and coverage context.**
 - Raw separation looks like a stable receiver trait (reliability 0.81).
 - After adjusting for route, coverage, down and formation, it falls to 0.61, and **short-route separation falls from 0.75 to 0.22.** Median separation differs by 1.6 yd between man and zone coverage alone.
 - Ranking receivers on raw separation largely ranks how they were used.
@@ -116,7 +116,7 @@ The data can rule out a large added separation signal from tracked top speed. Th
 | Finding (evidence) | Layer | Practical use |
 |---|---|---|
 | Tracked top speed is reliable (0.94–0.99) and, for WR/DB, about one-third distinct from the 40 | capacity | Record tracked peak speed alongside the 40; don't treat them as interchangeable for WR/DB |
-| WR Combine top speed tracks game top speed about equally on short and deep routes (ρ 0.49–0.58); the deep-route advantage is inconclusive | capacity → movement | Use tracked speed to forecast how fast a receiver will play, not where he will win |
+| WR Combine top speed tracks game top speed about equally on short and deep routes (ρ 0.49–0.58); the deep-route advantage is inconclusive | capacity → movement | Treat tracked peak speed as complementary information about game-speed movement, not as an established predictor of separation |
 | Players reach ≥ 90% of their own top game speed on 17% of WR deep routes vs 1% of short routes, ≤ 3% of OL/DL snaps (descriptive) | movement | Expect game top-speed evidence mainly from deep routes; a short-area role rarely shows it |
 | No detected added value of tracked speed over the 40 for deep separation; small effects not excluded | capacity → performance | Don't pay a separation premium for tracked top speed alone |
 | Raw separation is largely route and coverage context | performance vs deployment | Compare receivers on context-adjusted separation, against the same coverages |
