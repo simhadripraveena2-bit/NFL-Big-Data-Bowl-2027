@@ -34,7 +34,7 @@ def main():
         (OUT / f).parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(ROOT / f, OUT / f)
     (OUT / "dataset-metadata.json").write_text(json.dumps({
-        "title": "NFL BDB 2027 pipeline code (Combine speed to NFL movement)",
+        "title": "NFL BDB 2027 pipeline code",  # Kaggle: 6-50 characters
         "id": "<KAGGLE_USERNAME>/nfl-bdb-2027-pipeline-code",
         "licenses": [{"name": "apache-2.0"}],
         "description": "Pipeline code and aggregate registered results for the public notebook. No competition data."}, indent=1))

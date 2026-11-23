@@ -70,9 +70,8 @@ IS_KAGGLE = KAGGLE_INPUT.exists()
 def find_data_dir():
     cands = [os.environ.get('NFL_BDB_DATA'), str(KAGGLE_INPUT / 'nfl-big-data-bowl-2027'),
              str(KAGGLE_INPUT / 'competitions/nfl-big-data-bowl-2027')]
-    if IS_KAGGLE:
-        cands += sorted(str(p.parent) for p in KAGGLE_INPUT.glob('*/combine_results.csv'))
-        cands += sorted(str(p.parent) for p in KAGGLE_INPUT.glob('*/*/combine_results.csv'))
+    if IS_KAGGLE:   # mounts may be /kaggle/input/<slug>/, .../competitions/<slug>/ or deeper: search up to 4 levels
+        cands += [str(p.parent) for d in range(1, 5) for p in sorted(KAGGLE_INPUT.glob('*/' * d + 'combine_results.csv'))]
     here = Path.cwd()
     cands += [str(p / 'data/raw/nfl-big-data-bowl-2027') for p in (here, here.parent)]
     for c in cands:
@@ -84,8 +83,9 @@ def find_code_dir():
     cands = [os.environ.get('NFL_BDB_CODE')]
     if IS_KAGGLE:   # the pipeline code is attached as a small Kaggle dataset (src/ + scripts/; no data)
         # <root>/src/nfl_bdb/__init__.py -> parents[0]=nfl_bdb, [1]=src, [2]=<root> (the dataset root we need)
-        cands += sorted(str(p.parents[2]) for p in KAGGLE_INPUT.glob('*/src/nfl_bdb/__init__.py'))
-        cands += sorted(str(p.parents[2]) for p in KAGGLE_INPUT.glob('*/*/src/nfl_bdb/__init__.py'))
+        # searched up to 4 levels deep (e.g. /kaggle/input/datasets/<owner>/<slug>/src/...); the root must also hold the manifest
+        hits = [p.parents[2] for d in range(1, 5) for p in sorted(KAGGLE_INPUT.glob('*/' * d + 'src/nfl_bdb/__init__.py'))]
+        cands += [str(h) for h in hits if (h / 'research_notes/code_freeze.json').exists()] + [str(h) for h in hits]
     here = Path.cwd()
     cands += [str(here), str(here.parent)]
     for c in cands:
