@@ -1,0 +1,48 @@
+{
+ "version": "1.0",
+ "written": "2026-11-24, after the dev stage (seeds 101-103), before any held-out run",
+ "dev_run": "dev_20261124T232259Z",
+ "e3_lambda": "0.0001",
+ "e3_lambda_rule": "argmin mean dev RMSE vs theta_27 over quant30 and gauss005 at 10 Hz (dev only)",
+ "bootstrap_B": 100,
+ "estimands": {
+  "E1": "theta_05 = mean true tangential accel on [t_exit, t_exit+0.5]",
+  "E2": "theta_05",
+  "E3": "theta_27 = mean true tangential accel on [t_exit+0.2, t_exit+0.7]"
+ },
+ "calibrated_scenarios": [
+  "quant30 (2023-24 1/30-yd position grid + 0.002 yd jitter)",
+  "gauss005 (iid 0.005 yd; >= the 2025 estimate)"
+ ],
+ "criteria": {
+  "R_meas_min": 0.8,
+  "abs_bias_max": 0.3,
+  "failure_max": 0.1,
+  "coverage_range": [
+   0.9,
+   0.98
+  ],
+  "R_meas_min_at_2x_noise": 0.7
+ },
+ "required": [
+  "R_meas >= 0.80 in both calibrated scenarios (error variance <= 25% of true trial-level variance)",
+  "|bias| <= 0.30 yd/s^2 in both calibrated scenarios",
+  "failure rate <= 10% in both calibrated scenarios"
+ ],
+ "desirable": [
+  "95% coverage within [0.90, 0.98] in both calibrated scenarios",
+  "R_meas >= 0.70 at gauss 0.02 (2x-4x calibrated noise)"
+ ],
+ "selection": "among estimators meeting all required criteria, the one with the highest mean R_meas over the calibrated scenarios; if none meets them, Stage E fails and no real-data analysis is run",
+ "not_used_for_selection": [
+  "real-athlete ICC",
+  "associations with official Combine results",
+  "any NFL outcome"
+ ],
+ "holdout_seeds": [
+  2001,
+  2002,
+  2003
+ ],
+ "holdout_athletes_per_seed": 200
+}
