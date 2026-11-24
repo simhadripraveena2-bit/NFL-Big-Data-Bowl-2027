@@ -67,6 +67,8 @@ reports/figures/*
 !reports/figures/.gitkeep
 # simulation-only figures (synthetic data, no competition data) may be committed
 !reports/figures/sim_*.png
+!reports/figures/phase11_turn_reliability.png
+!reports/figures/phase11_turn_sensitivity.png
 .vscode/
 .idea/
 .DS_Store
