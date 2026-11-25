@@ -1,0 +1,12 @@
+{
+ "stage": "dev",
+ "run": "20261125T021428Z",
+ "rule": "(applied on dev only): adopt the analytic SG speed correction for a quantity if, at window 7,\nin every noise scenario, the corrected |median relative error| <= 0.02 and the corrected SD of the relative error is\n<= 1.2 x the uncorrected SD. Otherwise report uncorrected estimates with the held-out error as a bound.",
+ "decision": {
+  "speed": "adopt_correction",
+  "omega_deg": "report_uncorrected_with_bound",
+  "curvature": "report_uncorrected_with_bound",
+  "radius": "report_uncorrected_with_bound",
+  "a_n": "report_uncorrected_with_bound"
+ }
+}
