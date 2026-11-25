@@ -84,10 +84,13 @@ pip install -r requirements.txt
 | 5c. H2 (secondary, estimation-focused after D4) | ✅ Done — no incremental information detected; notebook 09 |
 | 5d. Secondary Holm family (H1-DB, H1-DL a/b, H5b), H5(a)/(c), H1-global, TE descriptives | ✅ Done — notebook 10, `research_notes/secondary_family_results.md` |
 | 8. Literature novelty audit | ✅ Done — no new algorithm justified; see `research_notes/phase8c_novelty_audit.md` |
+| 9–10. Submission build, Kaggle execution, release | ✅ Built, public code + notebook released; **not submitted** — `research_notes/phase9b_submission_audit.md`, `phase10_3_publication_audit.md` |
+| 11–17. Combine measurement-development branch (three-cone, shuttle, continuous-time estimator, skill drills, WR route launch, WR outcome power) | ⛔ **Closed** — no measurement approved for outcome validation; see [`research_notes/phase18_research_closeout.md`](research_notes/phase18_research_closeout.md) |
+| 18. Branch closure and evidence audit | ✅ Done — [`research_notes/phase18_research_closeout.md`](research_notes/phase18_research_closeout.md) |
 
 ## Research summary (current)
 
-The consolidated final summary, with claims, non-claims, limitations and opportunities, is in [`research_notes/research_findings_summary.md`](research_notes/research_findings_summary.md).
+The consolidated final summary, with claims, non-claims, limitations and opportunities, is in [`research_notes/research_findings_summary.md`](research_notes/research_findings_summary.md). The post-study measurement-development branch (Phases 11–17) and its closure, candidate decision matrix and evidence audit are in [`research_notes/phase18_research_closeout.md`](research_notes/phase18_research_closeout.md).
 
 **Title:** *Task-Conditioned Translation of Athletic Capacity: Connecting NFL Combine Sensor Tracking to Regular-Season Football Performance.*
 
