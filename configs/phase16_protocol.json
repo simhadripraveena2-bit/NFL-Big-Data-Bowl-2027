@@ -1,0 +1,84 @@
+{
+ "version": "1.0",
+ "written": "2026-11-25, before any Phase 16 real-athlete statistic and before the synthetic held-out run",
+ "launch_definition": {
+  "kinematics": "Phase 15 / skill_drills.kinematics: Savitzky-Golay order 2, window 7 (sensitivity 5, 9) on x, y at 10 Hz; speed = |v| from the SG derivative; a_t = numpy.gradient(speed, 0.1)",
+  "onset": "first frame index with SG speed > 1.0 yd/s",
+  "reject_if": [
+   "SG speed at frame 0 > 1.0 yd/s (onset before recording)",
+   "no frame exceeds 1.0 yd/s",
+   "onset + 10 > last frame (1.0-s window not fully observed)"
+  ],
+  "window": "frames onset .. onset+10 inclusive (t_onset to t_onset + 1.0 s)",
+  "primary": "95th percentile (numpy linear interpolation) of a_t over the window",
+  "diagnostics_only": [
+   "mean a_t over the window",
+   "net speed gain v(onset+10) - v(onset)"
+  ],
+  "identity": "route (original drill_name; SPEED_OUT_LEFT kept separate), draft year, route x year cell",
+  "routes": "the 13 Phase 15 route labels (12 route families); GAUNTLET and CIRCUS excluded",
+  "forty_reference": "identical definition applied to every Combine FORTY_YARD_DASH attempt of the WR (same onset, window, percentile); athlete value = mean over valid attempts; test-retest over the first two valid attempts"
+ },
+ "synthetic_acceptance": {
+  "seeds": {
+   "dev": [
+    101,
+    102,
+    103
+   ],
+   "holdout": [
+    2001,
+    2002,
+    2003
+   ]
+  },
+  "calibrated_scenarios": [
+   "quant30 (1/30-yd grid + 0.002 yd jitter)",
+   "gauss005"
+  ],
+  "criteria_holdout": {
+   "onset_error_abs_median_s_max": 0.05,
+   "launch_rel_bias_abs_max": 0.1,
+   "launch_measurement_reliability_min": 0.8,
+   "spearman_vs_true_athlete_A0_min": 0.8,
+   "failure_rate_max": 0.1
+  },
+  "rule": "If any criterion fails in either calibrated scenario, no athlete-level claim is made (stopping condition).",
+  "definitions": {
+   "onset_error": "estimated onset frame time minus true continuous time of first true speed > 1 yd/s",
+   "launch_truth_primary": "launch_p95_trend: 95th percentile of the step-free propulsive acceleration on the same 11-instant grid from the TRUE onset (the instantaneous a_t including 3.5-4.5 Hz step oscillation is reported as a secondary truth; 10 Hz smoothing cannot resolve it)",
+   "launch_rel_bias": "median of estimate / launch_p95_trend - 1",
+   "launch_measurement_reliability": "var(truth) / (var(truth) + var(estimate - truth)) per trial, after removing mean bias (trial level)",
+   "spearman_vs_true_athlete_A0": "athlete level: mean of the estimates over 10 synthetic routes (independent trials, effort kappa 0.75-0.95 per trial) vs the athlete's A0; athlete A0 ~ N(8.0, 8% CV)"
+  },
+  "note": "Definitions fixed after a single dev-seed smoke test (seed 101, design only) showed the instantaneous estimand is unresolvable at 10 Hz; no held-out data and no real-athlete statistic had been computed.",
+  "amendment_after_dev_before_holdout": {
+   "date": "2026-11-25",
+   "dev_run": "synthetic_dev_20261125T040656Z",
+   "observed_on_dev": "window 7: onset error median +0.040 s; launch relative bias -0.116 (SD 0.026); trial reliability 0.90; athlete-level Spearman with A0 0.96",
+   "amendment": "Criteria values are NOT changed. Interpretation is split: (a) onset, reliability, athlete-rank and failure criteria gate any athlete-level (relative, rank or variance-component) comparison; (b) the bias criterion gates only absolute-magnitude statements (yd/s^2). If (b) fails, launch values are reported as relative scores only.",
+   "disclosure": "This split was written after seeing dev results; it is reported as a deviation in the Phase 16 report."
+  }
+ },
+ "redundancy": {
+  "athlete_score": "athlete mean of route-year-standardised (z) launch p95 over valid routes (raw cell-centred version reported too)",
+  "references": [
+   "tracked-40 launch p95 (same definition)",
+   "official ten_yd_split",
+   "official forty",
+   "registered tracked-40 peak speed x_peak"
+  ],
+  "variance_components_model": "REML: z_launch ~ route x year cell (fixed) + standardised athlete-level sprint references (fixed) + athlete + athlete x route + residual; reduction of athlete variance vs the model without references",
+  "close_if_redundant": "athlete-variance share explained by the sprint references >= 0.70 (point estimate)",
+  "too_unreliable_if": "residual generalizability G(10) < 0.50 (point) or its bootstrap 95% lower bound < 0.30",
+  "otherwise": "CONDITIONAL GO: recommend (not conduct) a new pre-registration with one WR outcome"
+ },
+ "year_analysis": {
+  "harmonised_routes": "routes present in all three draft years under the same name: COMEBACK, CURL, DAGGER, GO, OVER_SHOULDER_ADJUST, POST_CORNER_ROUTE_RIGHT, RED_ZONE_FADE, SLANT, SLOT_SAIL, SLOT_STRIKE"
+ },
+ "bootstrap": {
+  "B": 200,
+  "unit": "athlete (cluster)",
+  "seed": 1616
+ }
+}
