@@ -1,0 +1,47 @@
+{
+  "phase": "19",
+  "title": "Feasibility: does tracked Combine peak speed add information beyond the official 40 for WR game speed?",
+  "status": "Committed BEFORE any simulation result was generated. Simulation only; no real Combine x game-outcome model is fitted.",
+  "population": "registered H1-WR eligible set (57 WR, run 20261121T135032Z); design = per player x context x team-season play counts only",
+  "outcome": "player's true context-adjusted mean play-maximum speed, composite = equal-weight mean of the deep and short player effects (H1 contexts and covariates unchanged)",
+  "calibration_outcome_only": {
+    "source": "Phase 4 outcome-only REML calibration (synthetic_validation.md section 1); no predictor involved",
+    "sigma_b": [[0.0616, 0.0557], [0.0557, 0.0849]],
+    "s2_team": 0.0104,
+    "s2_resid": [0.761, 1.455]
+  },
+  "calibration_combine_only": {
+    "r_obs_peak_forty_within_57": -0.851,
+    "R_P_best_of_2": 0.94,
+    "R_P_single_attempt": 0.89,
+    "note": "R_F (official 40) is not identified; admissible lower bound r^2 / mean(R_P) = 0.777"
+  },
+  "not_used": "any observed H1 or Phase 2 predictor-outcome association; effect sizes are a grid",
+  "grid": {
+    "R_F": [0.78, 0.85, 0.90, 0.95, 0.99],
+    "R_F_note": "0.78 = single-construct world (true peak = true 40 speed, rho* ~ 1): only pi = 0 is defined",
+    "a_true_validity_of_40": [0.3, 0.5, 0.7],
+    "pi_true_partial_of_peak_given_true_40": [0.0, 0.1, 0.2, 0.3, 0.4, 0.5],
+    "n_players": [57],
+    "n_scaling": {"n": [57, 100, 200, 400], "R_F": 0.90, "a": 0.5, "pi": [0.1, 0.2, 0.3]},
+    "reps": 2000,
+    "cv": "player-grouped 10-fold x 5 repeats per dataset",
+    "seed": 1919
+  },
+  "estimands": {
+    "E1_incremental_association": "observed-scale coefficient of standardised tracked peak given standardised official 40 (WLS two-stage, HC3; frozen confirmatory.wls_two_stage)",
+    "E2_incremental_prediction": "Delta R^2_CV (M3 - M1) on held-out PLAYERS' shrunken composite levels",
+    "E3_measurement_precision": "observed-scale E1 that arises when true peak = true 40 speed (single-construct world)",
+    "E4_distinct_construct": "true partial pi of true peak given true 40; requires R_F (EIV, frozen confirmatory.eiv_two_stage)"
+  },
+  "criteria": {
+    "C1_validity": "rejection rate of E1 at pi = 0, R_F = 0.99 <= 0.075 for every a, and HC3 95% CI coverage of the population observed-scale coefficient >= 0.92 in every cell",
+    "C2_power_central": "power of E1 (two-sided alpha 0.05) at pi = 0.3, R_F = 0.90, a = 0.5",
+    "C3_power_robust": "minimum power of E1 at pi = 0.3 over R_F in {0.85, 0.90, 0.95, 0.99} and a in {0.3, 0.5, 0.7}",
+    "C4_construct_identifiability": "rejection rate of E1 at pi = 0 for R_F in {0.78, 0.85} <= 0.10 (otherwise a significant E1 cannot be read as a distinct construct)",
+    "C5_prediction": "at pi = 0.3, R_F = 0.90, a = 0.5: mean Delta R^2_CV >= 0.02 and P(Delta R^2_CV > 0) >= 0.80",
+    "GO": "C1 passes AND C2 >= 0.80 AND C3 >= 0.70 AND C4 passes AND C5 passes",
+    "CONDITIONAL_GO": "C1 passes AND C2 >= 0.50 (exploratory estimation of E1/E2 only; E4 reported as non-identified if C4 fails)",
+    "NO_GO": "C1 fails OR C2 < 0.50"
+  }
+}
