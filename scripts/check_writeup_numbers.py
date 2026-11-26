@@ -64,7 +64,7 @@ checks = [
     # combine measurement
     ("rel WR best2", f"is 0.94 (WR) to {f2(rel['DL']['best_of_2'])} (DL)" if f2(rel['WR']['best_of_2']) == "0.94" else "WR rel mismatch"),
     ("unique WR/DB", f"(WR {round(100 * uv['WR']['unique_var'])}%, DB {round(100 * uv['DB']['unique_var'])}%)"),
-    ("unique DL", f"only {round(100 * uv['DL']['unique_var'])}% of peak-speed variance is unique"),
+    ("unique DL", f"only {round(100 * uv['DL']['unique_var'])}% of peak-speed variance is not explained by the 40"),
     ("WR peak vs split", f"(ρ = {f2([r for r in cm['vs_ten_yd_split'] if r['pos'] == 'WR'][0]['spearman'])})"),
     # demand
     ("demand WR deep/short", f"**WR deep routes do so on {round(100 * sd[('WR', 'deep')])}% of snaps, short routes on {round(100 * sd[('WR', 'short')])}%.**"),
@@ -76,15 +76,37 @@ checks = [
 # Phase 9B.1 mandatory headlines (writeup and figure source)
 FIGSRC = (ROOT / "src/nfl_bdb/visualization/submission_figures.py").read_text()
 H3 = "Players reach near-top game speed more often on deep routes than on short routes"
-H7 = "The pooled DL speed association is substantially sensitive to role and body-weight adjustment"
+H7 = "The pooled defensive-line speed association is substantially sensitive to role and body-weight adjustment"
 checks += [("Fig 3 headline in writeup (section 4)", "## 4. " + H3),
            ("Fig 3 descriptive caveat", "not a direct measurement of opportunity, and it is not evidence that Combine speed has a stronger effect on deep routes"),
            ("Section 7 heading", "## 7. " + H7)]
+# Phase 20 additions: power (source text must also contain the numbers), provenance, eligibility, framing
+PA = (ROOT / "research_notes/power_analysis.md").read_text()
+src_fails = [n for n, t in [("MDE source", "**0.27–0.33**"), ("power 0.2 source", "Power is **0.44** at Δ = 0.2"), ("central 0.30 source", "| WR | 0.33 | **0.30** |")] if t not in PA]
+checks += [("Title", "# What Combine Tracking Can and Cannot Tell Us About NFL Game Movement"),
+           ("H1-WR MDE", "80% power only for a difference of **0.27–0.33** (central scenario about 0.30). Power at a true difference of 0.20 was only about 0.44"),
+           ("H1-WR not equivalence", "This is **not** evidence that the two contexts are equivalent"),
+           ("separation provenance", "competition-supplied Next Gen Stats field `separation_at_pass_forward`. We did **not** rebuild nearest-defender distance"),
+           ("separation coverage", "The field exists for every route on a thrown pass, targeted or not, and is missing on sacks and scrambles"),
+           ("consistency check scope", "That is a consistency check on a subset, not proof of every defender assignment"),
+           ("eligibility", "**at least 100 qualifying regular-season opportunities**"),
+           ("no bust claim", "Nothing here predicts draft busts or career success"),
+           ("no distinct capacity", "we do **not** claim tracked peak speed is a separate athletic capacity"),
+           ("DL joint imprecise", "It is not evidence that speed hurts linemen"),
+           ("DL supported contrast", "What was supported is the *change* between the pooled and adjusted estimates"),
+           ("follow-up not fitted", "that model was never fitted to real data. It supports no conclusion either way")]
+FORBIDDEN = ["not the same thing as the 40", "distinct athletic capacity", "equally predictive", "tracking does not add information",
+             "significantly", "Phase 19", "commit", "novel algorithm"]
+forb_fails = [f for f in FORBIDDEN if f.lower() in W.lower()]
 fig_checks = [("Fig 3 title in figure", "Figure 3. " + H3), ("Fig 7 title in figure", "Figure 7. " + H7)]
-fails = [(n, e) for n, e in checks if e not in W] + [(n, e) for n, e in fig_checks if e not in FIGSRC]
+fails = [(n, e) for n, e in checks if e not in W] + [(n, e) for n, e in fig_checks if e not in FIGSRC] + \
+        [(n, "source text missing") for n in src_fails] + [("forbidden phrase", f) for f in forb_fails]
 checks += fig_checks
 for n, e in checks:
     print(("OK  " if (n, e) not in fails else "FAIL"), n, "::", e)
+for n, e in fails:
+    if (n, e) not in checks:
+        print("FAIL", n, "::", e)
 
 
 def wc(s):

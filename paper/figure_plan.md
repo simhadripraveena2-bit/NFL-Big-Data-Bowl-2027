@@ -30,12 +30,12 @@
 | # | file | message (title) | data / source run | uncertainty shown | layer |
 |---|---|---|---|---|---|
 | 1 | `figures/fig1_framework.png` | Four things that are easy to confuse | schematic; sample sizes from join validation 20261121T135032Z | n/a | all four layers |
-| 2 | `figures/fig2_tracking_vs_forty.png` | Tracking measures top speed reliably; for WR/DB it is not the same as the 40 | A: `forty_reliability/20261121T134306Z` (ICC(3,1) with 95 % CI, best-of-2 by Spearman–Brown). B: `phase3_screening/20261121T010253Z/predictor_structure` (1 − r²) | A: 95 % CI. B: point estimates (n given) | capacity |
+| 2 | `figures/fig2_tracking_vs_forty.png` | Tracked top speed is highly repeatable; for WR and DB the 40 explains about two-thirds of it (caption: the remainder includes measurement error; not a separate capacity) | A: `forty_reliability/20261121T134306Z` (ICC(3,1) with 95 % CI, best-of-2 by Spearman–Brown). B: `phase3_screening/20261121T010253Z/predictor_structure` (1 − r²) | A: 95 % CI. B: point estimates (n given) | capacity |
 | 3 | `figures/fig3_speed_demand.png` | Players reach near-top game speed more often on deep routes than on short routes (descriptive game-tracking measure; not opportunity, not evidence of a stronger Combine effect on deep routes) | `phase3_screening/.../speed_demand` (game data only) | descriptive shares (plays given) | movement |
-| 4 | `figures/fig4_translation.png` | Combine top speed shows up in game speed for WR and DL, much less for DB/OL | ρ_c: secondary run 20261122T015315Z `wald` block. Contrasts: H1-WR run 20261121T223645Z and the Holm family | Wald 95 % for ρ_c; registered bootstrap 95 % CIs for contrasts | capacity → movement |
+| 4 | `figures/fig4_translation.png` | Combine top speed tracks WR game speed; DB and OL links are weak; for DL see Figure 7 (WR note: 80% power needs Δ ≈ 0.3) | ρ_c: secondary run 20261122T015315Z `wald` block. Contrasts: H1-WR run 20261121T223645Z and the Holm family | Wald 95 % for ρ_c; registered bootstrap 95 % CIs for contrasts | capacity → movement |
 | 5 | `figures/fig5_h2_separation.png` | Tracked top speed did not add detectable information about deep separation | H2 run 20261122T012339Z: REML bootstrap CIs (`reml_bootstrap`) and player-grouped CV (`cv_frozen`) | bootstrap 95 % CI; CV point estimates with the 90 % LB quoted in the text | capacity → performance |
-| 6 | `figures/fig6_reliability.png` | Raw separation reflects use, not only the player | `phase3_screening/.../outcome_reliability` (outcome-blind); H2 reliability 0.44 in the caption | bootstrap 95 % CI (the short-route lower limit −0.66 is marked, not hidden) | performance vs deployment |
-| 7 | `figures/fig7_dl_role_weight.png` | The pooled DL speed association is substantially sensitive to role and body-weight adjustment | `secondary/.../dl_role_weight_diagnostics.json` (descriptive audit) and the registered H1-DL(b) result | mean ± SD (A); Wald 95 % (B, descriptive); registered bootstrap CI and Holm p in the title | capacity ↔ deployment |
+| 6 | `figures/fig6_reliability.png` | Much of a receiver's raw separation reflects route and coverage context (caption: split halves include team-season effects; H2 player-only 0.44) | `phase3_screening/.../outcome_reliability` (outcome-blind); H2 reliability 0.44 in the caption | bootstrap 95 % CI (the short-route lower limit −0.66 is marked, not hidden) | performance vs deployment |
+| 7 | `figures/fig7_dl_role_weight.png` | The pooled defensive-line speed association is substantially sensitive to role and body-weight adjustment | `secondary/.../dl_role_weight_diagnostics.json` (descriptive audit) and the registered H1-DL(b) result | mean ± SD (A); Wald 95 % (B, descriptive); registered bootstrap CI and Holm p in the title | capacity ↔ deployment |
 
 ## Tables (in the writeup text)
 
@@ -43,6 +43,10 @@
 |---|---|---|
 | T1 | analysed sample sizes per position (§2) | join validation + run outputs |
 | T2 | evaluator guidance: finding, layer, practical use (§8) | registered results above |
+
+## Phase 20 presentation revision
+
+Titles, captions and axis/box labels of Figures 1, 2, 3, 4, 5, 6 and 7 were reworded (Figure 1: separation box names the supplied NGS field; Figure 3: neutral pronoun; Figure 5: provenance note). No plotted value, interval or data source changed. `cover_image.png` is rebuilt by `scripts/build_cover_image.py`.
 
 ## Deliberately not shown
 

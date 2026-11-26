@@ -49,7 +49,7 @@ def fig1_framework(R: dict):
     boxes = {
         "cap": (0.2, 2.2, 2.8, 1.6, "COMBINE CAPACITY", "Tracked 40-yd peak speed\n(sensor data, best valid attempt)\n510 prospects, 2023–25", OKABE["blue"]),
         "mov": (3.6, 2.2, 2.8, 1.6, "GAME MOVEMENT", "Max speed on each REG play\n(10 Hz game tracking)\nby route / coverage / alignment", OKABE["orange"]),
-        "perf": (7.0, 2.2, 2.8, 1.6, "FOOTBALL PERFORMANCE", "WR separation at the throw\n(distance to nearest defender)\ndeep routes", OKABE["green"]),
+        "perf": (7.0, 2.2, 2.8, 1.6, "FOOTBALL PERFORMANCE", "WR separation at the throw\n(supplied NGS nearest-defender\ndistance; thrown passes)", OKABE["green"]),
         "dep": (3.6, 0.15, 2.8, 1.25, "DEPLOYMENT & BODY TYPE", "route mix, coverage, DL alignment\n(EDGE / interior), body weight", OKABE["purple"]),
     }
     for _, (x, y, w, h, title, body, col) in boxes.items():
@@ -104,12 +104,13 @@ def fig2_tracking_vs_forty(R: dict):
     a1.plot([], [], "D", color=GREY, label="best of two attempts (used)")
     a1.legend(loc="lower left", fontsize=8.5)
     a2.set_xlim(0, 45); a2.set_xlabel("% of tracked-peak-speed variance NOT\nexplained by the official 40 time (1 − r²)")
-    a2.set_title("B. What tracking adds beyond the 40", fontsize=11)
+    a2.set_title("B. Variance the official 40 does not explain", fontsize=11)
     a2.tick_params(axis="y", labelleft=False)
-    fig.suptitle("Figure 2. Combine tracking measures top speed reliably, and for WR and DB it is not the same as the 40",
+    fig.suptitle("Figure 2. Tracked top speed is highly repeatable; for WR and DB the 40 explains about two-thirds of it",
                  x=0.01, ha="left", fontsize=12, fontweight="bold", y=1.02)
     _note(fig, "Combine data only (no game outcome). Panel B: point estimates; n = combine participants with both measures. "
-               "Reliability: same-session repeat 40s; within-position ICC(3,1); best-of-two by Spearman–Brown.", y=-0.2)
+               "Reliability: same-session repeat 40s; within-position ICC(3,1); best-of-two by Spearman–Brown. The unexplained share "
+               "includes measurement error in both measures (the official 40's reliability is unknown); it is not evidence of a separate capacity.", y=-0.24)
     return fig
 
 
@@ -127,7 +128,7 @@ def fig3_speed_demand(R: dict):
         ax.barh(y, v, color=POS_COLOR[p], height=0.62, edgecolor=DARK, linewidth=0.6)
         ax.text(v + 0.3, y, f"{v:.1f}%   ({r['plays']:,} plays)", va="center", fontsize=9, color=DARK)
     ax.set_yticks(ys); ax.set_yticklabels([f"{p}: {CTX_NAME[c]}" for p, c in keep])
-    ax.set_xlim(0, 25); ax.set_xlabel("% of plays on which the player reaches ≥ 90% of his own top game speed")
+    ax.set_xlim(0, 25); ax.set_xlabel("% of plays on which the player reaches ≥ 90% of their own top game speed")
     ax.set_title("Figure 3. Players reach near-top game speed more often on deep routes than on short routes")
     _note(fig, "REG 2023–25, cohort players. Own top speed = mean of the player's 5 fastest REG plays. Descriptive game-tracking "
                "measure (no combine values): not a direct measure of opportunity, and not evidence that Combine speed matters more on "
@@ -161,7 +162,7 @@ def fig4_translation(R: dict):
     ax.set_xticks([-1, -0.5, 0, 0.5, 1])
     ax.set_xlabel("Correlation between combine tracked peak speed and the player's game-speed level (95% interval)")
     txt = {
-        "WR": f"Deep − short Δ = {con['H1-WR']['estimate']:.2f}\n[{con['H1-WR']['ci95'][0]:.2f}, {con['H1-WR']['ci95'][1]:.2f}]  INCONCLUSIVE\n(primary test)",
+        "WR": f"Deep − short Δ = {con['H1-WR']['estimate']:.2f}\n[{con['H1-WR']['ci95'][0]:.2f}, {con['H1-WR']['ci95'][1]:.2f}]  INCONCLUSIVE\n(primary test; 80% power needs Δ ≈ 0.3)",
         "TE": "Descriptive only\n(too few players to test)",
         "DB": f"Man − underneath Δ = {con['H1-DB']['estimate']:.2f}\n[{con['H1-DB']['ci95'][0]:.2f}, {con['H1-DB']['ci95'][1]:.2f}]  inconclusive",
         "DL": f"Pass rush − run Δ = {con['H1-DL(a)']['estimate']:.2f}\n[{con['H1-DL(a)']['ci95'][0]:.2f}, {con['H1-DL(a)']['ci95'][1]:.2f}]  no ≥0.15 gap",
@@ -172,7 +173,7 @@ def fig4_translation(R: dict):
         yy = [y_ for y_, (q, _) in zip(ys, order) if q == p]
         ax.text(1.06, sum(yy) / len(yy), txt[p] + f"\nplayers = {npl[p]}", va="center", fontsize=8.6, color=DARK)
     ax.axvline(1.02, color="#dddddd", lw=0.8)
-    ax.set_title("Figure 4. Combine top speed shows up in game speed for WR and DL, much less for DB and OL")
+    ax.set_title("Figure 4. Combine top speed tracks WR game speed; DB and OL links are weak; for DL see Figure 7")
     _note(fig, "Dots: REML estimates of the correlation with each player's noise-free game-speed level (play maximum speed, "
                "pre-throw for WR/TE), adjusting for pre-snap context. Bars: Wald 95% intervals (registered check output). "
                "Right: registered contrasts with bootstrap 95% CIs. Associations, not causal effects.", y=-0.03)
@@ -211,7 +212,8 @@ def fig5_h2(R: dict):
                  x=0.01, ha="left", fontsize=12, fontweight="bold", y=1.03)
     _note(fig, f"WR, n = {R['samples']['analysis']['H2-WR']['players']} players, {R['samples']['analysis']['H2-WR']['deep_plays']:,} deep routes on thrown passes. "
                "A: REML coefficient with player-cluster bootstrap (B = 2,000). B: player-grouped 10-fold cross-validation × 20. "
-               "Secondary, estimation-focused analysis (status fixed before any association was examined). Label: INCONCLUSIVE.", y=-0.2)
+               "Secondary, estimation-focused analysis (status fixed before any association was examined). Label: INCONCLUSIVE. "
+               "Separation = competition-supplied NGS value (player_play), not recomputed.", y=-0.24)
     return fig
 
 
@@ -241,10 +243,10 @@ def fig6_reliability(R: dict):
     ax.set_yticks(ys); ax.set_yticklabels([i[1] for i in items]); ax.set_xlim(-0.2, 1.0); ax.set_ylim(-0.75, len(items) - 0.5)
     ax.axvline(0, color=DARK, lw=0.8)
     ax.set_xlabel("Split-half reliability of the player-level average (0 = pure noise, 1 = stable trait)")
-    ax.set_title("Figure 6. Much of a receiver's raw separation reflects how he is used, not who he is")
+    ax.set_title("Figure 6. Much of a receiver's raw separation reflects route and coverage context")
     _note(fig, f"WR with ≥ 100 routes, REG 2023–25; game-parity split halves, Spearman–Brown corrected; bootstrap 95% CI over players. "
-               f"Outcome-blind (no combine data). The registered H2 model gives deep-separation reliability "
-               f"{R['h2']['reliability_deep_level']:.2f} (between-player SD {R['h2']['between_player_sd_yd']:.2f} yd).", y=-0.08)
+               f"Outcome-blind (no combine data). Split halves share team-seasons, so these values include team effects; the registered H2 "
+               f"model, which separates them, gives deep-separation reliability {R['h2']['reliability_deep_level']:.2f} (between-player SD {R['h2']['between_player_sd_yd']:.2f} yd).", y=-0.08)
     fig.subplots_adjust(right=0.78, bottom=0.26)
     return fig
 
@@ -278,10 +280,10 @@ def fig7_dl(R: dict):
     reg = d["registered"]
     a2.set_title(f"B. The pooled DL association is sensitive to role and weight\n"
                  f"registered test (pooled − adjusted) = {reg['estimate']:.2f} [{reg['ci95'][0]:.2f}, {reg['ci95'][1]:.2f}], Holm p = {reg['p_holm']:.3f}", fontsize=11)
-    fig.suptitle("Figure 7. The pooled DL speed association is substantially sensitive to role and body-weight adjustment",
+    fig.suptitle("Figure 7. The pooled defensive-line speed association is substantially sensitive to role and body-weight adjustment",
                  x=0.01, ha="left", fontsize=12, fontweight="bold", y=1.06)
     _note(fig, "DL, n = 53 (25 EDGE / 28 interior), REG 2023–25. B: descriptive audit intervals; only the registered pooled-minus-adjusted "
-               "test is inferential. Not causal: role partly results from athleticism; the adjusted value is not a speed effect.", y=-0.1)
+               "test is inferential. The jointly adjusted value is imprecise and is not evidence that speed hurts linemen; role partly results from athleticism.", y=-0.1)
     return fig
 
 
