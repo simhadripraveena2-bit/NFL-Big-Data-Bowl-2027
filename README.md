@@ -89,6 +89,7 @@ pip install -r requirements.txt
 | 18. Branch closure and evidence audit | ✅ Done — [`research_notes/phase18_research_closeout.md`](research_notes/phase18_research_closeout.md) |
 | 19. Feasibility: tracked peak beyond the official 40 for WR game speed (simulation only) | ⛔ **NO-GO** — [`research_notes/phase19_game_speed_incremental_feasibility.md`](research_notes/phase19_game_speed_incremental_feasibility.md) |
 | 20. Final submission revision (presentation only) | ✅ Done, **not submitted** — [`paper/final_writeup.md`](paper/final_writeup.md), [`research_notes/phase20_submission_revision_audit.md`](research_notes/phase20_submission_revision_audit.md) |
+| 21. Final reviewer corrections (presentation only) | ✅ Done, **not submitted** — [`research_notes/phase21_final_review_audit.md`](research_notes/phase21_final_review_audit.md) |
 
 ## Research summary (current)
 

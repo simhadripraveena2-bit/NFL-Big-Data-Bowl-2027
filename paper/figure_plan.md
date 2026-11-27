@@ -35,7 +35,7 @@
 | 4 | `figures/fig4_translation.png` | Combine top speed tracks WR game speed; DB and OL links are weak; for DL see Figure 7 (WR note: 80% power needs Δ ≈ 0.3) | ρ_c: secondary run 20261122T015315Z `wald` block. Contrasts: H1-WR run 20261121T223645Z and the Holm family | Wald 95 % for ρ_c; registered bootstrap 95 % CIs for contrasts | capacity → movement |
 | 5 | `figures/fig5_h2_separation.png` | Tracked top speed did not add detectable information about deep separation | H2 run 20261122T012339Z: REML bootstrap CIs (`reml_bootstrap`) and player-grouped CV (`cv_frozen`) | bootstrap 95 % CI; CV point estimates with the 90 % LB quoted in the text | capacity → performance |
 | 6 | `figures/fig6_reliability.png` | Much of a receiver's raw separation reflects route and coverage context (caption: split halves include team-season effects; H2 player-only 0.44) | `phase3_screening/.../outcome_reliability` (outcome-blind); H2 reliability 0.44 in the caption | bootstrap 95 % CI (the short-route lower limit −0.66 is marked, not hidden) | performance vs deployment |
-| 7 | `figures/fig7_dl_role_weight.png` | The pooled defensive-line speed association is substantially sensitive to role and body-weight adjustment | `secondary/.../dl_role_weight_diagnostics.json` (descriptive audit) and the registered H1-DL(b) result | mean ± SD (A); Wald 95 % (B, descriptive); registered bootstrap CI and Holm p in the title | capacity ↔ deployment |
+| 7 | `figures/fig7_dl_role_weight.png` | Defensive-line speed, weight and role travel together (caption carries the full headline: pooled association substantially sensitive to role and body-weight adjustment) | `secondary/.../dl_role_weight_diagnostics.json` (descriptive audit) and the registered H1-DL(b) result | mean ± SD (A); Wald 95 % (B, descriptive); registered bootstrap CI and Holm p in the title | capacity ↔ deployment |
 
 ## Tables (in the writeup text)
 
@@ -47,6 +47,17 @@
 ## Phase 20 presentation revision
 
 Titles, captions and axis/box labels of Figures 1, 2, 3, 4, 5, 6 and 7 were reworded (Figure 1: separation box names the supplied NGS field; Figure 3: neutral pronoun; Figure 5: provenance note). No plotted value, interval or data source changed. `cover_image.png` is rebuilt by `scripts/build_cover_image.py`.
+
+## Phase 21 reviewer corrections
+
+- Figure 1: "regular-season play" (no "REG").
+- Figure 2: panel B shows position labels; each panel title states its n (A: athletes with two tracked 40 attempts; B: athletes with tracked peak and official 40); caption in plain language (no ICC / Spearman–Brown); wider layout.
+- Figure 3: "Regular season" in the caption.
+- Figure 4: "mixed-model estimates", "model-based 95% intervals" (no REML / Wald).
+- Figure 5: short-route row relabelled "descriptive comparison" (point estimate positive, interval wide); caption in plain language.
+- Figure 6: caption gives the population (63 WR with ≥ 100 routes vs 57 in the registered analyses), a plain description of split-half reliability, and the short-route interval (−0.66 to 0.60), computed from `registered_results.json`.
+- Figure 7: short title "Defensive-line speed, weight and role travel together"; caption keeps the full headline, explains Holm and the imprecision of the adjusted value; axis "model-based 95% interval".
+- No plotted value or interval changed. The cover image is now purely typographic.
 
 ## Deliberately not shown
 
