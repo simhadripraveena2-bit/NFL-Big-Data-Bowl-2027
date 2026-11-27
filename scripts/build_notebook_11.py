@@ -281,7 +281,7 @@ where:
 - $b_{ic}$ is a correlated player effect;
 - $u$ is a team-season effect.
 
-The estimand is the correlation between Combine speed and the player's **estimated underlying player-level** game-speed level,
+The estimand is the correlation between Combine speed and the player's **underlying** game-speed level,
 
 $$\rho_c = \frac{\beta_c}{\sqrt{\beta_c^2 + \Sigma_{b,cc}}}, \qquad \Delta = \rho_h - \rho_l .$$
 

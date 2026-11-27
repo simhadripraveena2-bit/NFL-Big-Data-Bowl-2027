@@ -119,13 +119,14 @@ checks += [("slopes", "0.110 (deep) and 0.113 (short) yd/s of game speed per 0.2
            ("eligibility direction", "Eligible receivers were drafted much higher than ineligible receivers but were only about 0.02 seconds faster on the official 40"),
            ("table tracked peak", "its incremental value beyond the official 40 for game outcomes remains unresolved"),
            ("table separation CV", "official 40 alone and 40 + tracked peak both failed to beat the position average; adding tracked peak lowered R² by " + f"{abs(h2['cv_frozen']['dr2']):.3f}"),
-           ("table WR game speed", "not compared with the official 40")]
+           ("table WR game speed", "not compared with the official 40"),
+           ("model sentence", "A mixed model estimates each player's underlying game-speed level in each context")]
 R14 = (ROOT / "research_notes/h1_wr_robustness_results.md").read_text()
 src_fails += [n for n, t in [("R14 source", "| eligible (≥ 100 routes) | 57 | 4.465 ± 0.090 s | 11.12 yd/s | 3.8 | 12 % |"),
                              ("R14 source inel", "| ineligible | 37 | 4.485 ± 0.088 s | 11.10 yd/s | 5.4 | 46 % |")] if t not in R14]
 forb_fails = [f for f in FORBIDDEN if f.lower() in W.lower()]
 forb_fails += [f"figure source: {f}" for f in ["noise-free game-speed level"] if f in FIGSRC]
-fig_checks = [("Fig 3 title in figure", "Figure 3. " + H3), ("Fig 7 title in figure", F7), ("Fig 4 caption wording", "each player's estimated underlying player-level game-speed level"), ("Fig 5 descriptive label", "Short routes\\n(descriptive comparison)"), ("Fig 2 panel B labels shown", "a2.set_yticklabels"), ("Fig 6 short CI in caption", "short-route adjusted reliability")]
+fig_checks = [("Fig 3 title in figure", "Figure 3. " + H3), ("Fig 7 title in figure", F7), ("Fig 4 caption wording", "each player's underlying game-speed level"), ("Fig 5 descriptive label", "Short routes\\n(descriptive comparison)"), ("Fig 2 panel B labels shown", "a2.set_yticklabels"), ("Fig 6 short CI in caption", "short-route adjusted reliability")]
 fails = [(n, e) for n, e in checks if e not in W] + [(n, e) for n, e in fig_checks if e not in FIGSRC] + \
         [(n, "source text missing") for n in src_fails] + [("forbidden phrase", f) for f in forb_fails]
 checks += fig_checks

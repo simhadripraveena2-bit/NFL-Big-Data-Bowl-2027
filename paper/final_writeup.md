@@ -26,7 +26,7 @@ We keep four things separate (Figure 1): **capacity** (tracked 40 peak speed, yd
 | TE (descriptive only) | 17 | 4,170 |
 
 - **Safeguards.** The plan was pre-registered and the code frozen before the single Combine-to-game join; the pipeline was first tested on simulated data.
-- **Model.** A mixed model estimates each player's estimated underlying player-level game-speed level in each context, adjusting for route, coverage, down, distance, formation, time to throw, season, NFL year and team-season. We report its correlation with Combine peak speed, ρ (from −1 to 1; 0 means no linear relationship), with intervals from resampling players 2,000 times.
+- **Model.** A mixed model estimates each player's underlying game-speed level in each context, adjusting for route, coverage, down, distance, formation, time to throw, season, NFL year and team-season. We report its correlation with Combine peak speed, ρ (from −1 to 1; 0 means no linear relationship), with intervals from resampling players 2,000 times.
 - **Separation source.** Separation is the competition-supplied Next Gen Stats field `separation_at_pass_forward`. We did **not** rebuild nearest-defender distance; the game files track only cohort players. The field exists for every route on a thrown pass, targeted or not, and is missing on sacks and scrambles. Where a tracked cohort defender was nearest, its distance matched. That is a consistency check on a subset, not proof of every defender assignment.
 
 ## 3. Which Combine tracking measurements are reliable?
