@@ -174,7 +174,7 @@ def fig4_translation(R: dict):
         ax.text(1.06, sum(yy) / len(yy), txt[p] + f"\nplayers = {npl[p]}", va="center", fontsize=8.6, color=DARK)
     ax.axvline(1.02, color="#dddddd", lw=0.8)
     ax.set_title("Figure 4. Combine top speed tracks WR game speed; DB and OL links are weak; for DL see Figure 7")
-    _note(fig, "Dots: mixed-model estimates of the correlation with each player's noise-free game-speed level (play maximum speed, "
+    _note(fig, "Dots: mixed-model estimates of the correlation with each player's estimated underlying player-level game-speed level (play maximum speed, "
                "pre-throw for WR/TE), adjusting for pre-snap context. Bars: model-based 95% intervals (registered check output). "
                "Right: registered contrasts with bootstrap 95% CIs. Associations, not causal effects.", y=-0.03)
     fig.tight_layout(rect=(0, 0.06, 1, 1))

@@ -108,7 +108,7 @@ checks += [("Title", "# What Combine Tracking Can and Cannot Tell Us About NFL G
 FORBIDDEN = ["not the same thing as the 40", "distinct athletic capacity", "equally predictive", "tracking does not add information",
              "significantly", "Phase 19", "commit", "novel algorithm", "rule out a large", "rules out a gain", "negligible",
              "We make no novelty claim", "full texts not read", "alongside the 40", "H5(b)", "H1-DL(b)", " REG ", "(REG)", "Wald",
-             "ICC(3,1)", "Spearman–Brown", "less spread in short", "negative control"]
+             "ICC(3,1)", "Spearman–Brown", "less spread in short", "negative control", "noise-free"]
 H1SRC = (ROOT / "research_notes/h1_wr_confirmatory_results.md").read_text()
 src_fails += [n for n, t in [("slopes source", "**0.110 yd/s** higher on deep routes and **0.113 yd/s** higher on short routes"),
                              ("Sigma_b source (deep < short)", "[[0.0353, 0.0301], [0.0301, 0.0600]]")] if t not in H1SRC]
@@ -124,7 +124,8 @@ R14 = (ROOT / "research_notes/h1_wr_robustness_results.md").read_text()
 src_fails += [n for n, t in [("R14 source", "| eligible (≥ 100 routes) | 57 | 4.465 ± 0.090 s | 11.12 yd/s | 3.8 | 12 % |"),
                              ("R14 source inel", "| ineligible | 37 | 4.485 ± 0.088 s | 11.10 yd/s | 5.4 | 46 % |")] if t not in R14]
 forb_fails = [f for f in FORBIDDEN if f.lower() in W.lower()]
-fig_checks = [("Fig 3 title in figure", "Figure 3. " + H3), ("Fig 7 title in figure", F7), ("Fig 5 descriptive label", "Short routes\\n(descriptive comparison)"), ("Fig 2 panel B labels shown", "a2.set_yticklabels"), ("Fig 6 short CI in caption", "short-route adjusted reliability")]
+forb_fails += [f"figure source: {f}" for f in ["noise-free game-speed level"] if f in FIGSRC]
+fig_checks = [("Fig 3 title in figure", "Figure 3. " + H3), ("Fig 7 title in figure", F7), ("Fig 4 caption wording", "each player's estimated underlying player-level game-speed level"), ("Fig 5 descriptive label", "Short routes\\n(descriptive comparison)"), ("Fig 2 panel B labels shown", "a2.set_yticklabels"), ("Fig 6 short CI in caption", "short-route adjusted reliability")]
 fails = [(n, e) for n, e in checks if e not in W] + [(n, e) for n, e in fig_checks if e not in FIGSRC] + \
         [(n, "source text missing") for n in src_fails] + [("forbidden phrase", f) for f in forb_fails]
 checks += fig_checks
