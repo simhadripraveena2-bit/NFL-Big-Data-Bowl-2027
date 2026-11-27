@@ -24,7 +24,7 @@ md = lambda s: C.append(nbf.v4.new_markdown_cell(s.strip()))  # noqa: E731
 code = lambda s: C.append(nbf.v4.new_code_cell(s.strip()))  # noqa: E731
 
 md("""
-# From Combine Speed to NFL Movement: What Tracking Reveals About Receiver Separation
+# What Combine Tracking Can and Cannot Tell Us About NFL Game Movement
 ### NFL Big Data Bowl 2027: public reproducibility notebook
 
 This notebook accompanies the writeup. It does four things:
@@ -228,7 +228,7 @@ md("""
   - DB: coverage assignment (man / deep zone / underneath zone).
   - DL: pass rush vs run.
   - OL: pass block vs run.
-- **Separation (H2 performance outcome):** `separation_at_pass_forward`, the distance to the nearest defender at the throw. It is defined on every route of a thrown pass, and the inventory showed it equals the tracked nearest-defender distance.
+- **Separation (H2 performance outcome):** `separation_at_pass_forward`, the competition-supplied Next Gen Stats distance to the nearest defender at the throw (`player_play`). It is not rebuilt here: the game tracking holds only cohort players. It exists for every route on a thrown pass, targeted or not, and is missing on sacks and scrambles. Where a tracked cohort defender was nearest, the distances matched; that is a consistency check on a subset, not proof of every defender assignment.
 - **Eligibility:** a valid tracked 40; ≥ 100 primary REG opportunities; ≥ 20 plays in each contrast context (H2: ≥ 30 deep and ≥ 20 short routes, plus an official 40).
 
 **What this section does:** the frozen Phase 3 feature stage and `confirmatory_data` eligibility functions rebuild the play table and the analysis frames, then compare **counts** with the registered join. Combine values are not attached to any play here.
@@ -260,7 +260,7 @@ if RUN_GAME_PIPELINE:
 """)
 
 md("""
-**Descriptive context (game tracking only, no combine data): players reach near-top game speed more often on deep routes than on short routes.** The measure is the share of plays on which a player reaches ≥ 90 % of his own top game speed, where own top speed is the mean of his 5 fastest REG plays. It describes what was observed. It is not a direct measurement of opportunity, and it does not show that Combine speed has a stronger effect on deep routes (that was H1-WR, which is inconclusive). The registered values are shown; see writeup Figure 3.
+**Descriptive context (game tracking only, no combine data): players reach near-top game speed more often on deep routes than on short routes.** The measure is the share of plays on which a player reaches ≥ 90 % of their own top game speed, where own top speed is the mean of the player's 5 fastest REG plays. It describes what was observed. It is not a direct measurement of opportunity, and it does not show that Combine speed has a stronger effect on deep routes (that was H1-WR, which is inconclusive). The registered values are shown; see writeup Figure 3.
 """)
 code(r"""
 print(pl.DataFrame(REGISTERED['speed_demand']['rows']).sort('pos', 'context'))
@@ -329,10 +329,16 @@ print(f"\nH2 detail: held-out-player ΔR²_CV = {h2['cv_frozen']['dr2']:.3f} (90
 print(f"H1-DL(b) detail: pooled ρ {R['dl_b']['base_pooled']:.3f} → adjusted {R['dl_b']['adjusted_pooled']:.3f} (role + weight)")
 """)
 
+_h2 = REG["h2"]
+_fmt = lambda v: f"{v:+.1f}".replace("-", "−")  # noqa: E731
+H2_QUALIFIER = (f"The 95 % CI, {_fmt(_h2['beta_P_ci95_in'][0])} to {_fmt(_h2['beta_P_ci95_in'][1])} inches per SD of tracked peak speed "
+                f"({_h2['beta_P_ci95_yd'][0]:.3f} to {_h2['beta_P_ci95_yd'][1]:.3f} yd), still allows a positive effect of about half the "
+                f"between-player SD of deep separation ({_h2['between_player_sd_yd']:.2f} yd), so **moderate effects remain possible**; "
+                "the data do not establish that the added effect is zero.").replace("-0.", "−0.")
 md("""
 **How to read these (registered wording):**
 - **H1-WR is INCONCLUSIVE.** The deep-vs-short difference is neither supported nor ruled out.
-- **H2 is INCONCLUSIVE.** No incremental predictive value of tracked peak speed beyond the official 40 was detected for deep-route separation. This is **not** evidence that speed has no effect on separation: the true-scale partial correlation could not be estimated, because deep separation has low player-level reliability (0.44).
+- **H2 is INCONCLUSIVE.** No incremental predictive value of tracked peak speed beyond the official 40 was detected for deep-route separation. This is **not** evidence that speed has no effect on separation: the true-scale partial correlation could not be estimated, because deep separation has low player-level reliability (0.44). """ + H2_QUALIFIER + """
 - **H1-DL(b) is supported after Holm adjustment (p = 0.032).** The pooled DL association is substantially sensitive to role and weight adjustment. The adjusted value must not be read causally.
 """)
 
